@@ -1,0 +1,4 @@
+* text=auto eol=lf
+*.deb binary
+*.gpg binary
+*.xz binary

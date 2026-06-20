@@ -1,0 +1,7 @@
+# Local working trees and build output. Generated APT artifacts are intentionally
+# versioned in debian/, KEY.gpg, BUILD-MANIFEST.txt and *.sources.
+/upstream/
+/dist/
+/.secrets/
+/.gnupg/
+*.tmp

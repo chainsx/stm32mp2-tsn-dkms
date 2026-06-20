@@ -1,0 +1,275 @@
+name: Build, commit and publish STM32MP257 TSN APT repository
+
+on:
+  workflow_dispatch:
+    inputs:
+      tsn_version:
+        description: "TSN stack version embedded in package versions"
+        required: true
+        default: "1.6.8"
+        type: string
+      switch_commit:
+        description: "Exact tttech-tsn-swch-content commit pinned by OpenSTLinux scarthgap"
+        required: true
+        default: "28c85fb3a2205766947298eddcdba8149ed37068"
+        type: string
+      include_userspace:
+        description: "Build libtsn, tsntool and DE-PTP arm64 packages"
+        required: true
+        default: true
+        type: boolean
+      include_acm:
+        description: "Also build optional ACM DKMS and libacmconfig packages"
+        required: true
+        default: false
+        type: boolean
+      acm_commit:
+        description: "Exact tttech-tsn-acm-content commit; used only when ACM is enabled"
+        required: true
+        default: "23e1ed7d9942136d0526d6f429f0efc3ed2fe35e"
+        type: string
+      accept_tttech_license:
+        description: "I accept the ST/TTTech terms applicable to the selected user-space payload"
+        required: true
+        default: false
+        type: boolean
+      confirm_public_redistribution_rights:
+        description: "I confirm that publication of the selected user-space .deb files is permitted"
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: stm32mp257-tsn-publish
+  cancel-in-progress: false
+
+jobs:
+  build-dkms:
+    name: Build TSN DKMS source packages
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Require a manual run from main
+        shell: bash
+        run: |
+          test "$GITHUB_REF" = refs/heads/main || { echo 'Run this workflow from main.' >&2; exit 1; }
+
+      - name: Install DKMS packaging tools
+        run: |
+          sudo apt-get update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
+            apt-utils ca-certificates dpkg-dev file git make xz-utils
+
+      - name: Validate the repository template
+        run: ./scripts/test-template.sh
+
+      - name: Fetch pinned OpenSTLinux TSN source
+        run: |
+          ./scripts/fetch-upstream.sh \
+            --out upstream \
+            --switch-ref '${{ inputs.switch_commit }}' \
+            --acm-ref '${{ inputs.acm_commit }}' \
+            --with-acm '${{ inputs.include_acm }}'
+
+      - name: Build DKMS source and runtime packages
+        run: |
+          ./scripts/build-dkms.sh \
+            --source upstream \
+            --version '${{ inputs.tsn_version }}' \
+            --out dist/debian \
+            --with-acm '${{ inputs.include_acm }}' \
+            --maintainer '${{ github.repository_owner }} <${{ github.repository_owner }}@users.noreply.github.com>'
+
+      - name: Upload DKMS packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: tsn-dkms-packages
+          if-no-files-found: error
+          path: dist/debian/*.deb
+
+  build-userspace:
+    name: Build TSN arm64 user-space packages
+    if: inputs.include_userspace
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Require explicit user-space license acknowledgements
+        shell: bash
+        run: |
+          test '${{ inputs.accept_tttech_license }}' = true || { echo 'TTTech/ST license acknowledgement is required for user-space packages.' >&2; exit 1; }
+          test '${{ inputs.confirm_public_redistribution_rights }}' = true || { echo 'Public redistribution acknowledgement is required for user-space packages.' >&2; exit 1; }
+
+      - name: Install arm64 build and packaging tools
+        run: |
+          sudo apt-get update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
+            build-essential ca-certificates dpkg-dev git libbsd-dev make xz-utils
+
+      - name: Fetch pinned OpenSTLinux TSN source
+        run: |
+          ./scripts/fetch-upstream.sh \
+            --out upstream \
+            --switch-ref '${{ inputs.switch_commit }}' \
+            --acm-ref '${{ inputs.acm_commit }}' \
+            --with-acm '${{ inputs.include_acm }}'
+
+      - name: Build arm64 user-space packages
+        run: |
+          ./scripts/build-userspace.sh \
+            --source upstream \
+            --version '${{ inputs.tsn_version }}' \
+            --out dist/debian \
+            --with-acm '${{ inputs.include_acm }}' \
+            --maintainer '${{ github.repository_owner }} <${{ github.repository_owner }}@users.noreply.github.com>'
+
+      - name: Upload user-space packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: tsn-userspace-packages
+          if-no-files-found: error
+          path: dist/debian/*.deb
+
+  publish:
+    name: Sign, commit and publish flat APT repository
+    needs: [build-dkms, build-userspace]
+    if: >-
+      always() && needs.build-dkms.result == 'success' &&
+      (needs.build-userspace.result == 'success' || needs.build-userspace.result == 'skipped')
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Install archive tools
+        run: |
+          sudo apt-get update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
+            apt-utils dpkg-dev gnupg
+
+      - name: Import APT signing key
+        env:
+          APT_GPG_PRIVATE_KEY: ${{ secrets.APT_GPG_PRIVATE_KEY }}
+        shell: bash
+        run: |
+          test -n "$APT_GPG_PRIVATE_KEY" || { echo 'Missing Actions secret: APT_GPG_PRIVATE_KEY' >&2; exit 1; }
+          export GNUPGHOME="$RUNNER_TEMP/gnupg"
+          mkdir -p "$GNUPGHOME"
+          chmod 700 "$GNUPGHOME"
+          printf '%s' "$APT_GPG_PRIVATE_KEY" | gpg --batch --import
+          fpr="$(gpg --batch --with-colons --list-secret-keys | awk -F: '$1 == "fpr" { print $10; exit }')"
+          test -n "$fpr" || { echo 'No secret signing key was imported.' >&2; exit 1; }
+          echo "GNUPGHOME=$GNUPGHOME" >> "$GITHUB_ENV"
+          echo "APT_SIGNING_KEY=$fpr" >> "$GITHUB_ENV"
+
+      - name: Download package artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: tsn-*-packages
+          path: dist/debian
+          merge-multiple: true
+
+      - name: Build meta packages
+        run: |
+          ./scripts/build-meta.sh \
+            --version '${{ inputs.tsn_version }}' \
+            --out dist/debian \
+            --with-userspace '${{ inputs.include_userspace }}' \
+            --with-acm '${{ inputs.include_acm }}' \
+            --maintainer '${{ github.repository_owner }} <${{ github.repository_owner }}@users.noreply.github.com>'
+
+      - name: Generate manifest and signed repository
+        run: |
+          mkdir -p dist/site/debian
+          cp dist/debian/*.deb dist/site/debian/
+          ./scripts/fetch-upstream.sh \
+            --out upstream-manifest \
+            --switch-ref '${{ inputs.switch_commit }}' \
+            --acm-ref '${{ inputs.acm_commit }}' \
+            --with-acm '${{ inputs.include_acm }}'
+          ./scripts/make-manifest.sh \
+            --source upstream-manifest \
+            --packages dist/debian \
+            --out dist/site/BUILD-MANIFEST.txt \
+            --version '${{ inputs.tsn_version }}' \
+            --with-userspace '${{ inputs.include_userspace }}' \
+            --with-acm '${{ inputs.include_acm }}'
+          ./scripts/update-apt-repo.sh \
+            --repo dist/site/debian \
+            --key-id "$APT_SIGNING_KEY" \
+            --public-key dist/site/KEY.gpg \
+            --origin '${{ github.repository }}' \
+            --label 'STM32MP257 TSN APT Archive'
+          sed \
+            -e 's|@GITHUB_OWNER@|${{ github.repository_owner }}|g' \
+            -e 's|@GITHUB_REPOSITORY@|${{ github.event.repository.name }}|g' \
+            sources/stm32mp2-tsn.sources.in > dist/site/stm32mp2-tsn.sources
+          cp README.md NOTICE-REDISTRIBUTION.md dist/site/
+
+      - name: Commit generated APT repository to main
+        shell: bash
+        run: |
+          rm -rf debian
+          mkdir -p debian
+          cp -a dist/site/debian/. debian/
+          install -m 0644 dist/site/KEY.gpg KEY.gpg
+          install -m 0644 dist/site/stm32mp2-tsn.sources stm32mp2-tsn.sources
+          install -m 0644 dist/site/BUILD-MANIFEST.txt BUILD-MANIFEST.txt
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A -- debian KEY.gpg stm32mp2-tsn.sources BUILD-MANIFEST.txt
+          if git diff --cached --quiet; then
+            echo 'APT publication is already current.'
+            exit 0
+          fi
+          git commit -m "Publish STM32MP257 TSN ${{ inputs.tsn_version }}" \
+                     -m 'Generated by GitHub Actions from pinned OpenSTLinux sources.'
+          git push origin HEAD:main
+
+      - name: Upload complete repository artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: stm32mp257-tsn-${{ inputs.tsn_version }}
+          if-no-files-found: error
+          path: |
+            debian/*.deb
+            debian/Packages*
+            debian/Release*
+            debian/InRelease
+            KEY.gpg
+            stm32mp2-tsn.sources
+            BUILD-MANIFEST.txt
+
+      - name: Upload GitHub Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist/site
+
+  deploy:
+    name: Deploy GitHub Pages
+    needs: publish
+    runs-on: ubuntu-24.04
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

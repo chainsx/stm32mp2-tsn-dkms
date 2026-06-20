@@ -1,0 +1,8 @@
+PACKAGE_NAME="stm32mp257-tsn-edge"
+PACKAGE_VERSION="@VERSION@"
+BUILT_MODULE_NAME[0]="edgx_pfm_lkm"
+DEST_MODULE_LOCATION[0]="/updates/dkms"
+MAKE[0]="make KDIR=${kernel_source_dir} target=platform sched=fsc sid=sid"
+CLEAN="make clean"
+AUTOINSTALL="yes"
+REMAKE_INITRD="yes"

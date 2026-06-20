@@ -1,0 +1,8 @@
+PACKAGE_NAME="stm32mp257-tsn-deip"
+PACKAGE_VERSION="@VERSION@"
+BUILT_MODULE_NAME[0]="stm32_deip"
+DEST_MODULE_LOCATION[0]="/updates/dkms"
+MAKE[0]="make KDIR=${kernel_source_dir}"
+CLEAN="make clean"
+AUTOINSTALL="yes"
+REMAKE_INITRD="yes"

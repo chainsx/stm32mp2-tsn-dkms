@@ -1,0 +1,27 @@
+Architectures: arm64 all
+Codename: ./
+Components: main
+Date: Sat, 20 Jun 2026 17:25:21 +0000
+Label: STM32MP257 TSN APT Archive
+Origin: chainsx/stm32mp2-tsn-dkms
+Suite: ./
+MD5Sum:
+ ace6e9bee52d75b008ac02b10af5cdd2             7792 Packages
+ 587564affab90696c7863ffa65ba43bb             2653 Packages.gz
+ 5bda5cfc9b106a52d364cf0827ce8cd9             2500 Packages.xz
+ c1a62fb82720cbb07b9cd9db17c8d26c              171 Release
+SHA1:
+ de8500a08f242b36198e2379d6410e56d75526be             7792 Packages
+ c37aaf60fc24ea420d15c5b9a1a12e2af83dc5fb             2653 Packages.gz
+ d87499d9dfe3aa714f00d66cea57af6a6538ac30             2500 Packages.xz
+ 35c58bc96bbbc1b93604b826a9a1aa6705a9d216              171 Release
+SHA256:
+ 466485c0e72018707d2ada2fdc1273aed5e08553f8b31a4f2bc05e89a4c99eba             7792 Packages
+ 46aed95708c3520bd3a31263a3427e55509ca184baa040cba6f2a91b196a9892             2653 Packages.gz
+ 6b7f8748a1c355196149182762909864a3a79fe25d680333d551fca84f728f66             2500 Packages.xz
+ ee7d4d971fa648e8e7d59e612e567baae8fb31de0107b2f3c32e8cb2574c46e5              171 Release
+SHA512:
+ 38cf3492358b3514dd1b6b56144d6329bfd01573b2e1f2a7dd69b25bf25d31eee59973a9def582be28531d3e51e22f07c3753236bed094dcd2d12d81cd5b301a             7792 Packages
+ 8a4c29204cb2e148e2a424598bf67220bba662566a454eb869b249e3189f3bcbc92e09d0d1b0c306bd5eae9b27159bcbef19300998e11c17916d7dfdd80df8ae             2653 Packages.gz
+ a901e0a897501468325d0490914d89040041a69973a5dc5602ca07e94ac16577e153a19456d4995968dd899c4ffb7e5c8e50c77aa79b634d790c565c80c08ab4             2500 Packages.xz
+ f1880ed12aa9b8f4759002b7240a987ba40255d560d4fd5e05dd551c2e99fb6722a3b5537a952b15fb1def2e7b741bf8884a86473823683c303f89fe004f6a1d              171 Release

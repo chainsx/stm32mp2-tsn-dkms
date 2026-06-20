@@ -1,0 +1,176 @@
+Package: stm32mp257-tsn-acm-config
+Architecture: arm64
+Version: 1.6.8-1
+Priority: optional
+Section: misc
+Maintainer: chainsx <chainsx@users.noreply.github.com>
+Depends: libc6
+Filename: ./stm32mp257-tsn-acm-config_1.6.8-1_arm64.deb
+Size: 115052
+MD5sum: 9e131cd7cd53d2750fb0ecd968ab6f37
+SHA1: 9f782e0700d47693116e8208caa7a657bc5d69ae
+SHA256: 56e05e1630101d43b462b00ad2221399ec0c1db0608eb658dce593b3cd8bc69a
+SHA512: cf5e58009b0ed3f81cfdde7a0b173813e6fed82f50abeba390b7c7cb9affaac7473b30920bddff978ea0333956e83c2550ebc757916149afe3187cd13c2f315a
+Description: TTTech ACM user-space configuration interface library
+ OpenSTLinux-compatible STM32MP257 Ethernet Switch / TSN component.
+
+Package: stm32mp257-tsn-acm-dkms
+Architecture: all
+Version: 1.6.8-1
+Priority: optional
+Section: misc
+Maintainer: chainsx <chainsx@users.noreply.github.com>
+Depends: dkms, stm32mp257-tsn-edge-dkms (= 1.6.8-1)
+Filename: ./stm32mp257-tsn-acm-dkms_1.6.8-1_all.deb
+Size: 413856
+MD5sum: 01a57a4208b73aaf0ef3d493b4314a4b
+SHA1: 7558cf28df20daa34e318bcf4e956c5a66f77e4f
+SHA256: be5833acfb465637d200c2102bf7d037e45b9523548d65aa2c0ec1e2ce964943
+SHA512: 6476473903afd0dc5e9a50bada3d65d69617610b3d62e085fcf676738b7b134bcbde04cf3b977ee41ec61d5407a7e62f4b27d947d36188bcbcf988d668b0d20d
+Description: TTTech Acceleration Module kernel module (DKMS)
+ OpenSTLinux-compatible STM32MP257 Ethernet Switch / TSN component.
+
+Package: stm32mp257-tsn-acm-runtime
+Architecture: all
+Version: 1.6.8-1
+Priority: optional
+Section: misc
+Maintainer: chainsx <chainsx@users.noreply.github.com>
+Depends: stm32mp257-tsn-acm-dkms (= 1.6.8-1), stm32mp257-tsn-edge-runtime (= 1.6.8-1), kmod
+Filename: ./stm32mp257-tsn-acm-runtime_1.6.8-1_all.deb
+Size: 770
+MD5sum: 2a9368a66f365e27ebbeac2eb6a3d67a
+SHA1: 000f3e0c2653096f72c67191e94041ac42f57911
+SHA256: 995f16133dbc0bf1fb7cf5690abd5013ae485866b013bcbd37cd61b029789cd5
+SHA512: 812684890c65ba88d4ad6056ebc42d390c5ac26fc2c5773d8abb8442907b3bf7ed7bf1bd5597386ec2db7d874f01c468c8f343227972fedd8ac16a93cef8d80e
+Description: ACM automatic load and module dependencies
+ OpenSTLinux-compatible STM32MP257 Ethernet Switch / TSN component.
+
+Package: stm32mp257-tsn-acm
+Architecture: all
+Version: 1.6.8-1
+Priority: optional
+Section: misc
+Maintainer: chainsx <chainsx@users.noreply.github.com>
+Depends: stm32mp257-tsn-switch (= 1.6.8-1), stm32mp257-tsn-acm-dkms (= 1.6.8-1), stm32mp257-tsn-acm-runtime (= 1.6.8-1), stm32mp257-tsn-acm-config (= 1.6.8-1)
+Filename: ./stm32mp257-tsn-acm_1.6.8-1_all.deb
+Size: 622
+MD5sum: 601c7127c698556beae1a42eaddef49e
+SHA1: 6aebc2c5e6ca9ea45aa0f8df3c697afa3e77d861
+SHA256: c9bb1b6b79d9581852367466b0d910801c2c98c955818372aeec1c03c0e1ee14
+SHA512: 5837e2ae5d2c32eb155685f4f2abd9e5b1254449c1a5909b16865f83027163b4d8c66e6e642a79909295c55fb932bf5756994f5cfa88d51b42a1134a34c048be
+Description: STM32MP257 TSN Acceleration Module stack
+ OpenSTLinux-compatible STM32MP257 Ethernet Switch / TSN component.
+
+Package: stm32mp257-tsn-deip-dkms
+Architecture: all
+Version: 1.6.8-1
+Priority: optional
+Section: misc
+Maintainer: chainsx <chainsx@users.noreply.github.com>
+Depends: dkms
+Filename: ./stm32mp257-tsn-deip-dkms_1.6.8-1_all.deb
+Size: 3640
+MD5sum: 45a48063c21796fded17b25dc888d857
+SHA1: 1cc95d0b606122e1ffcda8c670d90dc0fa289c7a
+SHA256: 99f4a0615ffb3b09c0196f3e7ce97ec214786b7a4d1c0ec7d702d6066a35e6f3
+SHA512: 04df5bc1a6044acebad9aa73e672b25d0ab76d92b95851906c3955b2c081c402f27e349979d16c8c3d41b0f0461e7758be2d8f186735ccce2d9c446c956b1f5b
+Description: STM32 DEIP glue kernel module (DKMS)
+ OpenSTLinux-compatible STM32MP257 Ethernet Switch / TSN component.
+
+Package: stm32mp257-tsn-deptp
+Architecture: arm64
+Version: 1.6.8-1
+Priority: optional
+Section: misc
+Maintainer: chainsx <chainsx@users.noreply.github.com>
+Depends: libc6
+Filename: ./stm32mp257-tsn-deptp_1.6.8-1_arm64.deb
+Size: 122316
+MD5sum: 81c610e63f63a6c244b0f7c620e8e15c
+SHA1: e10a1a524b15c079bcec7549f53bf15299ddb653
+SHA256: 214c528cd5607cfddd2d0ab2a69eda5c60187aa0c64aa719ada56fe5b377c24c
+SHA512: 1f41c044ef0ed132b3f33712103acf0bc65f329d32800d92d4604dca57a00310c8b62a4b8da1a371b5228f87292356ce10aadcd50bbdd1cc32cd8e3513a4e177
+Description: TTTech DE-gPTP daemon for TSN Ethernet Switch
+ OpenSTLinux-compatible STM32MP257 Ethernet Switch / TSN component.
+
+Package: stm32mp257-tsn-edge-dkms
+Architecture: all
+Version: 1.6.8-1
+Priority: optional
+Section: misc
+Maintainer: chainsx <chainsx@users.noreply.github.com>
+Depends: dkms
+Filename: ./stm32mp257-tsn-edge-dkms_1.6.8-1_all.deb
+Size: 135758
+MD5sum: ca29848d79f638132b56ebd803e10957
+SHA1: c7e690540816fcd4e3462252b538bb247fce37eb
+SHA256: 7e9f6d272ccfe6f536e8d6202352beb9352bf0ae1cb2d3e2ccaab62726ed6c7a
+SHA512: 55f097b8318fcf509461357413cbb06edf702f272bfb234bc66f03189cb7f1cbffc499921f56a293a9c547dff01051c9a45dccef3e103131bb75c0738045e8b0
+Description: TTTech EDGE Ethernet Switch kernel module (DKMS)
+ OpenSTLinux-compatible STM32MP257 Ethernet Switch / TSN component.
+
+Package: stm32mp257-tsn-edge-runtime
+Architecture: all
+Version: 1.6.8-1
+Priority: optional
+Section: misc
+Maintainer: chainsx <chainsx@users.noreply.github.com>
+Depends: stm32mp257-tsn-edge-dkms (= 1.6.8-1), kmod
+Filename: ./stm32mp257-tsn-edge-runtime_1.6.8-1_all.deb
+Size: 1100
+MD5sum: 51a9eb1493e9078ef62296b4c497ff18
+SHA1: b8e084b34b859360838fa0bcedfac74f36e59c67
+SHA256: 6144fc666edd5816df580333f69d22732873d3ad3ca980975778051030ea903d
+SHA512: ae34aa96993dff9f3e4c277109114dbe5bcba1390694fc81aa573e874469ee1c1b9299445ab7d5464b629bb4d1fa76d3952f218e052b16a759904e59ee9d1d53
+Description: EDGE automatic load and module options
+ OpenSTLinux-compatible STM32MP257 Ethernet Switch / TSN component.
+
+Package: stm32mp257-tsn-libtsn
+Architecture: arm64
+Version: 1.6.8-1
+Priority: optional
+Section: misc
+Maintainer: chainsx <chainsx@users.noreply.github.com>
+Depends: libc6
+Filename: ./stm32mp257-tsn-libtsn_1.6.8-1_arm64.deb
+Size: 63758
+MD5sum: 7974aaf781db5612d138384e339a8158
+SHA1: 4416c4e1734ba0c4350477f9c3404fef63a65e8c
+SHA256: 159e0489264e55fdc650e8a316fef49c8e2cf4c749f3a6613098f7c7fa76ef52
+SHA512: 41b242443e516a86baf829006da1052fa8ff1adb0e2d09723d136b30919f0dc996d6c411edec120ce2153439848ad117a0950a8c0b4007faffe3b432555519f9
+Description: TTTech TSN user-space API library
+ OpenSTLinux-compatible STM32MP257 Ethernet Switch / TSN component.
+
+Package: stm32mp257-tsn-switch
+Architecture: all
+Version: 1.6.8-1
+Priority: optional
+Section: misc
+Maintainer: chainsx <chainsx@users.noreply.github.com>
+Depends: stm32mp257-tsn-deip-dkms (= 1.6.8-1), stm32mp257-tsn-edge-dkms (= 1.6.8-1), stm32mp257-tsn-edge-runtime (= 1.6.8-1), stm32mp257-tsn-libtsn (= 1.6.8-1), stm32mp257-tsntool (= 1.6.8-1), stm32mp257-tsn-deptp (= 1.6.8-1)
+Filename: ./stm32mp257-tsn-switch_1.6.8-1_all.deb
+Size: 622
+MD5sum: b9ad88c97e58b2a25ad6a68ca9e8d35b
+SHA1: d2880276810a801bab3006f18216e76066b94020
+SHA256: 1470ee65d56ccfcd9eac6658ebb5c12bcd216cd79ee89e43619b2a4d607ab326
+SHA512: dbdb12fb8576b1a3d868261e4d863353918a4ca467e688363e6c61588334670a1bcbbe2e5e8ef30372a524024206032e77e8c7834d72e8dc5f270d03b76a3124
+Description: STM32MP257 Ethernet Switch / TSN stack
+ OpenSTLinux-compatible STM32MP257 Ethernet Switch / TSN component.
+
+Package: stm32mp257-tsntool
+Architecture: arm64
+Version: 1.6.8-1
+Priority: optional
+Section: misc
+Maintainer: chainsx <chainsx@users.noreply.github.com>
+Depends: stm32mp257-tsn-libtsn (= 1.6.8-1), libc6, libbsd0
+Filename: ./stm32mp257-tsntool_1.6.8-1_arm64.deb
+Size: 54252
+MD5sum: 0af8c51d8ed79232a6fcefbe36160dd1
+SHA1: 239db905dff6d8e0a222c30e3af18cdd80abb406
+SHA256: c04b7cb5495020aba5793c6f14699c41cc2bdd0d54512c7fd13a301b87aed20a
+SHA512: 74a335a3eb2350effc53fd2c0d0906e11b49348af87ecb11bcb2703816f932e8e5296a57ee4e482926ba6e92da60eae2ad27c613421540f36e6d9d923c25d58c
+Description: TTTech TSN Ethernet Switch configuration utility
+ OpenSTLinux-compatible STM32MP257 Ethernet Switch / TSN component.
+

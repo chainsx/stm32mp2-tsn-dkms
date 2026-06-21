@@ -21,7 +21,7 @@ name: Build and publish STM32MP2 TSN packages for Debian 13
       edge_interface:
         description: "Main TSN bridge interface, matching DEFAULT_ETHERNET_MAIN_TSN_BRIDGE_INTERFACE"
         required: true
-        default: "end1"
+        default: "eth0"
         type: string
       include_userspace:
         description: "Build the opt-in TTTech libtsn, tsntool and DE-PTP Debian 13 arm64 packages"

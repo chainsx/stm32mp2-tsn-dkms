@@ -6,11 +6,11 @@ Section: misc
 Maintainer: chainsx <chainsx@users.noreply.github.com>
 Depends: libc6, stm32mp2-tsn-edge-runtime (= 1.6.8-1)
 Filename: ./stm32mp2-tsn-acm-config_1.6.8-1_arm64.deb
-Size: 112956
-MD5sum: 0082e38452c20467a6c07b1289fc59ab
-SHA1: c34b1160c2e84012eb6fc2623eb3b88fe192b379
-SHA256: 246e61221e8afb1fa4ed5101e77586da68c0e1fec4e88902c40f30f724121bc5
-SHA512: 2e6433afd6c11ae24ae8b63ae15b18ab6d62d8d12b9f8517b92eb519cc424c518a594e1c5eab0fab18acc37aa22b434ab7ab8b40cc322096cf5f55736a6e29fc
+Size: 112732
+MD5sum: 48bfce8250bddf10493796bd47092e58
+SHA1: 7caec543486a634ab1b3cc3fe1a817a57ac62709
+SHA256: 4ef0d6982b75357878d02f248c9360615f5a814d07b3cf31c91bd64b7fc7aefb
+SHA512: e169c5d59902aa691c1dfe35544f855f2bfcf84f0562407eabaa5cbf0b4317a664638293783bd08943b340ed55a118543877903be26d5d9e1dbce829edb1b5e1
 Description: TTTech ACM user-space configuration interface
  OpenSTLinux-aligned STM32MP2 TSN component for Debian GNU/Linux 13 (trixie) arm64.
 
@@ -22,11 +22,11 @@ Section: misc
 Maintainer: chainsx <chainsx@users.noreply.github.com>
 Depends: dkms (>= 3.0.0), build-essential, kmod, stm32mp2-tsn-edge-dkms (= 1.6.8-1)
 Filename: ./stm32mp2-tsn-acm-dkms_1.6.8-1_all.deb
-Size: 415340
-MD5sum: 04237e2fc01b70d027463abf5a26213e
-SHA1: 985cd6212a3c90fe4ad59786d66717d72eafd049
-SHA256: b738b722531bfde72d8b4c53a0df0764414f1692e3214988845fad3a154218c1
-SHA512: 4687640d22da679006c4d5d0a96b0baf3f21049da50b202940e03d20b296779f40a1af35c96a5d1fc234bbeb85f4a5bb3cc948b1fc8c6e6a5b65a1925f057605
+Size: 415996
+MD5sum: 29a4ac0d1459e9fc4be0fb6988933d85
+SHA1: 0f5eca2d5470cb34eb1e86d2a6899a6b74f35381
+SHA256: 67ccce780aab0a089aff7dba867fb656cada7364ac724d4089a165032182e7f2
+SHA512: 4d40780b0b366f2678be640a6bddc159a49d4d24f18ad699bbd9b97dbcae1dbab28ac9fca3f1e39a9561667b12a74513ff4e5a1d079c9dc351657e6947468cac
 Description: TTTech Acceleration Module kernel module (DKMS)
  OpenSTLinux-aligned STM32MP2 TSN component for Debian GNU/Linux 13 (trixie) arm64.
 
@@ -39,10 +39,10 @@ Maintainer: chainsx <chainsx@users.noreply.github.com>
 Depends: stm32mp2-tsn-acm-dkms (= 1.6.8-1), stm32mp2-tsn-edge-runtime (= 1.6.8-1), kmod
 Filename: ./stm32mp2-tsn-acm-runtime_1.6.8-1_all.deb
 Size: 1260
-MD5sum: 4bd74cc1a0e3049c73874462d669050e
-SHA1: 2145acaabdf22b7b40585a6a555b704d3053d60e
-SHA256: 618a979163e19ac271c29739e6527068536851a56af30ddf4c2dbfd8e69eac35
-SHA512: f02de8227b85d4ade6ff512e9404a29243fe2780ff5a28b40f09b9cd3b8924bd3e58ed2bdb12324e99780887d4284bc990fbddbd9dff8190a7a40ecb55ef09ae
+MD5sum: 646aa579875ced112421e0b56fad9a18
+SHA1: c18da2803f60ac27f9a1076d10e69105784618dc
+SHA256: cfbb587c516b242eba4745196e6fd6e97d3d3f39a0600fa811e9be5f983a4d64
+SHA512: 1405877e798f0ea5b7d4bccba837cef2fd3f1c52c76e4182ab4996b32be02b7d6d42014711af397791e5eb108a2865ca607ec6a7d66302c8cad9abd9c66f24cb
 Description: ACM automatic load and module dependency configuration
  OpenSTLinux-aligned STM32MP2 TSN component for Debian GNU/Linux 13 (trixie) arm64.
 
@@ -54,11 +54,11 @@ Section: misc
 Maintainer: chainsx <chainsx@users.noreply.github.com>
 Depends: stm32mp2-tsn-switch (= 1.6.8-1), stm32mp2-tsn-acm-dkms (= 1.6.8-1), stm32mp2-tsn-acm-runtime (= 1.6.8-1), stm32mp2-tsn-acm-config (= 1.6.8-1)
 Filename: ./stm32mp2-tsn-acm_1.6.8-1_arm64.deb
-Size: 1140
-MD5sum: 15e5cef82dae761f4533c97fd46e0671
-SHA1: a70e95bd4d63911bff0fc1405a2299c660b7671e
-SHA256: c053f07a6433d1c4855e1ddc26c9dfc52e95d5168340417d465d85dd44ef9ad4
-SHA512: 45d17fc751af601c20d066d7f5766e74f7828e7f20dd98db706c6d4dc26562e4f206d57f3cfd3129452fc945e12ece239bf07de7852d0b17045de87cefac3eca
+Size: 1142
+MD5sum: a950c814d56dff540b0decb97c8ada55
+SHA1: c90262efa1c7b5778a5211c5659d81d73efec464
+SHA256: b73d5660e8aaa71c8ccca0ec2f92b693f953608b7d9afacb49dae07282b219e0
+SHA512: 87af2f9d9626c116a5f6bb71290ae1980677398d58cd01e2336fdb8d90f24f5a7cdb4d35b43b1828ea47646080ef351f9f395df9aa90bcce259e3f59ff03224a
 Description: STM32MP257 optional TSN Acceleration Module stack
  OpenSTLinux-aligned STM32MP2 TSN component for Debian GNU/Linux 13 (trixie) arm64.
 
@@ -70,11 +70,11 @@ Section: misc
 Maintainer: chainsx <chainsx@users.noreply.github.com>
 Depends: dkms (>= 3.0.0), build-essential, kmod
 Filename: ./stm32mp2-tsn-deip-dkms_1.6.8-1_all.deb
-Size: 4604
-MD5sum: e0d2cc6d0435a3b43f8f83154610418c
-SHA1: 945487c8d7167162566aeb2b352c371088d7e4de
-SHA256: 52d8484c7cf6542362c73b2fb4ce50fc2de696d267879395a7e81ea449a2b404
-SHA512: 100367c2f178f76183bde220a63b7c4c63f9954e07339609289a5cf542d5682507af4969f4b611d1442a03967197ca9cc66af1a405f59c87898aba061ca1da41
+Size: 5248
+MD5sum: 4deaf892fca8aab3e0105c60a3186c6f
+SHA1: a8b83fb143d34f1a4f796a76acee1bf325cb0a81
+SHA256: 7fb4b86e4d6269f4cf4453b96ee40f8637628badedfecc9bb011079aebc3f33a
+SHA512: 91a97b5524c798181d8f42aa70cb7eb4b2a94761928c00edf7df2cded4b22338955e11c119c97e4eb1285657b620bc514893dc1a6f92a7091d3d90ccbbb68e28
 Description: STM32 DEIP glue kernel module (DKMS)
  OpenSTLinux-aligned STM32MP2 TSN component for Debian GNU/Linux 13 (trixie) arm64.
 
@@ -86,11 +86,11 @@ Section: misc
 Maintainer: chainsx <chainsx@users.noreply.github.com>
 Depends: libc6, systemd
 Filename: ./stm32mp2-tsn-deptp_1.6.7+2.5.2+20240628-1_arm64.deb
-Size: 110556
-MD5sum: e7aa64bcb2e4b8482a21e6b676602cef
-SHA1: 4781e8f3870a64e3040ff6fe4719bc0c773ca324
-SHA256: 6c35677d639c7d986f36a77f001bdd7cae90b3ff4ef4bcdf5b32b44661dd5557
-SHA512: e6d5e83f6bf90c0c429b40eb415b42697516919b729b843252abdbdf3a13ce56c07e5b07059740742d69f45dca0e58fe6cb92cfb4479d55f0817f392dd713262
+Size: 110284
+MD5sum: 7338b3d7227105107a48fd1fb5448311
+SHA1: 39d4682ec89a6c8c93015ab999fee01ff5ba1fb0
+SHA256: ff1c80ba6e63fbbc7ab2d47ea8cd91dd2c86ef90bb62f282ea12a749d41beb12
+SHA512: dfc81b657e46dcb97dddaf639ceb1039a30936487b0dc42a9ff80514674ae97250f98b7190f62d6b832686ee2fd8bdc9ada52023b233f544dd77478ac1c5696e
 Description: TTTech DE-gPTP daemon for STM32MP257 TSN Switch
  OpenSTLinux-aligned STM32MP2 TSN component for Debian GNU/Linux 13 (trixie) arm64.
 
@@ -102,11 +102,11 @@ Section: misc
 Maintainer: chainsx <chainsx@users.noreply.github.com>
 Depends: stm32mp2-tsn-edge-dkms (= 1.6.8-1)
 Filename: ./stm32mp2-tsn-edge-dev_1.6.8-1_all.deb
-Size: 1614
-MD5sum: ca2d410bc7636626d867c98ff35fd01a
-SHA1: 0398c93da5e9b102dfef3155b8f560da0a4ef9ff
-SHA256: 7d7a8f8d4e5527887e191606a9936dfd315353facf59b1b449124386d51853ab
-SHA512: 2190b3d76e109a33de75faf07caafc2554097e2356e050f015ebc7a8e472804fa58641f810cb14d9d11c279f12afb5b58b52bfa80839fe5583596335cd36c45c
+Size: 1612
+MD5sum: d642b7042711b0478eb77c526d0770e9
+SHA1: 2c755be167cb7f3aae688a6686b13f3d762fb706
+SHA256: cb00d1bf4a8407e03d23ea7b5fc7c4c8a15b7b3e6e7ea5279cf2944f8b1e295f
+SHA512: 0b780e7a74d0f43f34e365c28b97653049a5e1575c9ed8b19f14d2ffa4abf5e7e384e69925aab89b7de9d7531e63de257ef586efee17646d5eedb0a55fbe0ce6
 Description: TTTech EDGE public kernel interface header
  OpenSTLinux-aligned STM32MP2 TSN component for Debian GNU/Linux 13 (trixie) arm64.
 
@@ -118,11 +118,11 @@ Section: misc
 Maintainer: chainsx <chainsx@users.noreply.github.com>
 Depends: dkms (>= 3.0.0), build-essential, kmod, stm32mp2-tsn-deip-dkms (= 1.6.8-1)
 Filename: ./stm32mp2-tsn-edge-dkms_1.6.8-1_all.deb
-Size: 136836
-MD5sum: 33704046deac53e184dfda826f12eee4
-SHA1: 01684ada3dcec9822bc41da92fa4979e4075f4bc
-SHA256: 11c231845d0ec041b465ce154d8d975ed4305eba3e2e173a3e6c74a1e0f528b6
-SHA512: e116a4e8bd4b1a80d9eb95b424f36a1563449c7c329ffaa1a0e3d3558f6128854bbfe62320000f4d1e217b789e421f85b6544e789d1c35ba7f3895f7020d6995
+Size: 137416
+MD5sum: a1adc477ffce8788a2290920d68eab9d
+SHA1: 229a645d3ea96777ff680101a2b52845163deabe
+SHA256: 0ae987f637006659440402538e4278c0363ef8c3aa3fb19f9e9328736e765a32
+SHA512: 41775467be72fa06ec0e011e725df1a66e88afd5b5462e55aad147ba4084404b558c0b5d628ed71ad726fac981d88ea26c10a2a8594730346682cecbcc9e2ba1
 Description: TTTech EDGE Ethernet Switch kernel module (DKMS)
  OpenSTLinux-aligned STM32MP2 TSN component for Debian GNU/Linux 13 (trixie) arm64.
 
@@ -134,11 +134,11 @@ Section: misc
 Maintainer: chainsx <chainsx@users.noreply.github.com>
 Depends: stm32mp2-tsn-edge-dkms (= 1.6.8-1), stm32mp2-tsn-deip-dkms (= 1.6.8-1), kmod
 Filename: ./stm32mp2-tsn-edge-runtime_1.6.8-1_all.deb
-Size: 1366
-MD5sum: 16dae286815e8a5cf0c6c4ea260db882
-SHA1: 823d6b6337f789e5dec69d941bcc5a5ab53bd6b1
-SHA256: 575dc500e2e4e2474186aeae81ca2a92d71f6a8343a13fdcd3e69e81ac05493c
-SHA512: c5f9e84138b1281dba07725bfc593b55e36b76330cf951085eb94ed836a8677a7e426d452bda3ab805568e531edf8395a01151967dbd20186e1f561064194a5d
+Size: 1364
+MD5sum: cbc0ff4fa7acfb64c09747f7bc0a0a90
+SHA1: 7de62382bae0cd1cce99ef18a4d7eacc93b4f280
+SHA256: 2929b555c82ef2b7a9f25e0302556839d7439034fd7f5875d72959d5641cc89e
+SHA512: 28d520f1de574b8ba01adc7a176d6dfa19db44a0affe8cd2ebbb0ed2b340043200543a63b54c0d6ee9834915ad1d3d31858ec6ab6f2473c9d9cbdf5ba7214cbb
 Description: OpenSTLinux-aligned EDGE module-load and modprobe configuration
  OpenSTLinux-aligned STM32MP2 TSN component for Debian GNU/Linux 13 (trixie) arm64.
 
@@ -151,11 +151,11 @@ Section: misc
 Maintainer: chainsx <chainsx@users.noreply.github.com>
 Depends: stm32mp2-tsn-libtsn (= 1.6.8-1)
 Filename: ./stm32mp2-tsn-libtsn-dev_1.6.8-1_arm64.deb
-Size: 21204
-MD5sum: d20f3ae846a6456c9384f8fcc95d28a5
-SHA1: a0a584f13e2ba4e68f62655b2588992eee6d7389
-SHA256: b70f10f9cbbf1565336575e15e2fab968639ef6561fde22d7b62493cd09edee6
-SHA512: 6258e4665f20e5ace166c8b1804516630bf8bcddee571bb42a5abfd879e26728e94e72504df5697d867eaaea25eea8651c8baa8e4c3003e93f6eba2f6734c22a
+Size: 21212
+MD5sum: 1d01281a78fc73159cabc6230facbd12
+SHA1: b5c918132b36abfeabaeb008cf91ef01a61e6f88
+SHA256: cf51a754c627b2e1d59c0343a749bd1efa3911778190a4c4f990e0b1e5a9d091
+SHA512: b8296355827138fb5dcb2a20aa1aacbae9c40269fc20206658bb1bc4e3ba07f90bf439449c57016905e017411700af0c68b4bf8ceaa898f3bf4a4d29d6ff8d6b
 Description: TTTech TSN Switch API development headers and link library
  OpenSTLinux-aligned STM32MP2 TSN component for Debian GNU/Linux 13 (trixie) arm64.
 
@@ -168,11 +168,11 @@ Section: misc
 Maintainer: chainsx <chainsx@users.noreply.github.com>
 Depends: stm32mp2-tsn-libtsn-dev (= 1.6.8-1)
 Filename: ./stm32mp2-tsn-libtsn-staticdev_1.6.8-1_arm64.deb
-Size: 32156
-MD5sum: 6f1c0868e8f695771875832010ede2e2
-SHA1: 4df9c2e168c3995d52b66e86dfbdc066e635594b
-SHA256: 4d963d2ec7af84769fac123d519f786672dd2521cca4bd952062adec65dd3e78
-SHA512: 8deac8108c1cfc1a7bf14675d944e5f4707dc01bb95402f3bc787e8104b81590a3d41c0d30148334422cf78cd22b94c46a389fea2d20e2cd3abf9bfea38bdec4
+Size: 32136
+MD5sum: 5d7d44bdc54767d30fb296c69fe34379
+SHA1: 7c2920ea386224ed3daadcaa8a5c5dc4f30e690b
+SHA256: 6f6232207d5fa7ae5209ebc8d2f934eaf73e34065a68556eeea36d02d263d939
+SHA512: 6def126295df34330c16434861fd45dffc2a4b538da4c6da23f84cbc871f80ce482db2478e522d428096b7da17683a6018620df61f8c9239e062d333b8f5522f
 Description: TTTech TSN Switch static API library
  OpenSTLinux-aligned STM32MP2 TSN component for Debian GNU/Linux 13 (trixie) arm64.
 
@@ -185,11 +185,11 @@ Section: misc
 Maintainer: chainsx <chainsx@users.noreply.github.com>
 Depends: libc6
 Filename: ./stm32mp2-tsn-libtsn_1.6.8-1_arm64.deb
-Size: 34092
-MD5sum: e108c02263e7b90c6f53eadd3852e4ad
-SHA1: 67f302f160cd23a2719f3fa4c88a915b5fb6d2d2
-SHA256: 9baaaf7ce1f613e326f7f32e513f0a6e0c0a8dab79d4b553b6b6607bedc9e352
-SHA512: 7699dcfeed77d6d5ae68d744689388c6483fdf7bb3c5a24e0bba6870d32906b154ced0c4846e44dc7ba3d0368f1dd5b60b1f60b05686aac9cf8b42a44244e0af
+Size: 34132
+MD5sum: 0ca757d730b76ce734b024d260dede4d
+SHA1: 411ec297278b39abded1614a5b80d1bee5ed1dca
+SHA256: 851cc52778271638961e8db63a5bee03622616cea953f540f6ac010f82672516
+SHA512: d9dc1d920e43e47687cfd33398b300b79aba730b39eb76e2c71550e4cdde71d9fc93805897062e5406b150848452b21f852632cc2324c5ed83d19250d5563cd7
 Description: TTTech TSN Switch runtime API library
  OpenSTLinux-aligned STM32MP2 TSN component for Debian GNU/Linux 13 (trixie) arm64.
 
@@ -202,10 +202,10 @@ Maintainer: chainsx <chainsx@users.noreply.github.com>
 Depends: stm32mp2-tsn-deip-dkms (= 1.6.8-1), stm32mp2-tsn-edge-dkms (= 1.6.8-1), stm32mp2-tsn-edge-runtime (= 1.6.8-1), stm32mp2-tsn-libtsn (= 1.6.8-1), stm32mp2-tsntool (= 1.6.8-1), stm32mp2-tsn-deptp (= 1.6.7+2.5.2+20240628-1)
 Filename: ./stm32mp2-tsn-switch_1.6.8-1_arm64.deb
 Size: 1176
-MD5sum: 299da9a60f157b3bc489d6258f40db1c
-SHA1: 6eac2d066c0f3693c98a09d53ac565881cc87beb
-SHA256: 14ae1fcb24cdb933d616400297058e935357ba44540d9bc2df3aa7995b9be6f2
-SHA512: 31193713356d81537cdf51c5d2e0d1530018c6753896dcbdf00d6e22cb77c5fa47fe89c7c16e27b9d796961dcf3a961d3fd7c17c12f0b968b401c071223b208e
+MD5sum: 0782217a4918a7a1f1ec02d9cc9fa51e
+SHA1: 2d69d17a65ab6f2565eeed38868d000611978e3f
+SHA256: bcf29457b5155d7092178859ffc7518c1270bbe75ba69efc67337073b29b2d4e
+SHA512: 628a01ce2084213586d3c347e64a82d7843e50d9d5bc98f4c72d3f91c8647d9f3bfe7890e37189ca80117c83d14b914e856cc2228e9a54e4754bfb9dac6405f6
 Description: STM32MP257 Ethernet Switch / TSN base stack
  OpenSTLinux-aligned STM32MP2 TSN component for Debian GNU/Linux 13 (trixie) arm64.
 
@@ -217,11 +217,11 @@ Section: misc
 Maintainer: chainsx <chainsx@users.noreply.github.com>
 Depends: stm32mp2-tsn-libtsn (= 1.6.8-1), libc6,libmd0,libbsd0
 Filename: ./stm32mp2-tsntool_1.6.8-1_arm64.deb
-Size: 48496
-MD5sum: 0906a4ef0f154da8715c0b0723ef3b50
-SHA1: 7d4d34585e60cef018d1def4b3f5e74fdec6ec5d
-SHA256: be853c00012004fa590985ae4a555f9382e196dfdef7a51727248deba1855054
-SHA512: efa7c50a681adb6bd40776eb1670ef1555c0a79be067218cef28f9b1a5b7dc11fc472fcfdf91381c7ace83c78ebbb80c0cb0bb88a35bf3e64e12d55c5866bb7b
+Size: 48588
+MD5sum: 82258ad4d172d6feec08d1b740f22fd5
+SHA1: 63d11cd1fda8d5b73819fc1bd367447a67c48d04
+SHA256: f4d875f5275d4af781cd2a57000c1477a0dd3c191fe8379a7a8a7ffae2d299af
+SHA512: 03568873cc651d01596daaf362adfc5adcd376daefe8e4954dddd5008e124549072a45dbe589ed4af62dc10f84116f174f53481716f8e674fc784a36cfd35bb4
 Description: TTTech TSN Ethernet Switch configuration utility
  OpenSTLinux-aligned STM32MP2 TSN component for Debian GNU/Linux 13 (trixie) arm64.
 

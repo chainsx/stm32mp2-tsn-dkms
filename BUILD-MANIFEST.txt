@@ -51,17 +51,17 @@ Version: 1.6.8-1
 Architecture: arm64
 
 SHA256:
-246e61221e8afb1fa4ed5101e77586da68c0e1fec4e88902c40f30f724121bc5  dist/debian/stm32mp2-tsn-acm-config_1.6.8-1_arm64.deb
-b738b722531bfde72d8b4c53a0df0764414f1692e3214988845fad3a154218c1  dist/debian/stm32mp2-tsn-acm-dkms_1.6.8-1_all.deb
-618a979163e19ac271c29739e6527068536851a56af30ddf4c2dbfd8e69eac35  dist/debian/stm32mp2-tsn-acm-runtime_1.6.8-1_all.deb
-c053f07a6433d1c4855e1ddc26c9dfc52e95d5168340417d465d85dd44ef9ad4  dist/debian/stm32mp2-tsn-acm_1.6.8-1_arm64.deb
-52d8484c7cf6542362c73b2fb4ce50fc2de696d267879395a7e81ea449a2b404  dist/debian/stm32mp2-tsn-deip-dkms_1.6.8-1_all.deb
-6c35677d639c7d986f36a77f001bdd7cae90b3ff4ef4bcdf5b32b44661dd5557  dist/debian/stm32mp2-tsn-deptp_1.6.7+2.5.2+20240628-1_arm64.deb
-7d7a8f8d4e5527887e191606a9936dfd315353facf59b1b449124386d51853ab  dist/debian/stm32mp2-tsn-edge-dev_1.6.8-1_all.deb
-11c231845d0ec041b465ce154d8d975ed4305eba3e2e173a3e6c74a1e0f528b6  dist/debian/stm32mp2-tsn-edge-dkms_1.6.8-1_all.deb
-575dc500e2e4e2474186aeae81ca2a92d71f6a8343a13fdcd3e69e81ac05493c  dist/debian/stm32mp2-tsn-edge-runtime_1.6.8-1_all.deb
-b70f10f9cbbf1565336575e15e2fab968639ef6561fde22d7b62493cd09edee6  dist/debian/stm32mp2-tsn-libtsn-dev_1.6.8-1_arm64.deb
-4d963d2ec7af84769fac123d519f786672dd2521cca4bd952062adec65dd3e78  dist/debian/stm32mp2-tsn-libtsn-staticdev_1.6.8-1_arm64.deb
-9baaaf7ce1f613e326f7f32e513f0a6e0c0a8dab79d4b553b6b6607bedc9e352  dist/debian/stm32mp2-tsn-libtsn_1.6.8-1_arm64.deb
-14ae1fcb24cdb933d616400297058e935357ba44540d9bc2df3aa7995b9be6f2  dist/debian/stm32mp2-tsn-switch_1.6.8-1_arm64.deb
-be853c00012004fa590985ae4a555f9382e196dfdef7a51727248deba1855054  dist/debian/stm32mp2-tsntool_1.6.8-1_arm64.deb
+4ef0d6982b75357878d02f248c9360615f5a814d07b3cf31c91bd64b7fc7aefb  dist/debian/stm32mp2-tsn-acm-config_1.6.8-1_arm64.deb
+67ccce780aab0a089aff7dba867fb656cada7364ac724d4089a165032182e7f2  dist/debian/stm32mp2-tsn-acm-dkms_1.6.8-1_all.deb
+cfbb587c516b242eba4745196e6fd6e97d3d3f39a0600fa811e9be5f983a4d64  dist/debian/stm32mp2-tsn-acm-runtime_1.6.8-1_all.deb
+b73d5660e8aaa71c8ccca0ec2f92b693f953608b7d9afacb49dae07282b219e0  dist/debian/stm32mp2-tsn-acm_1.6.8-1_arm64.deb
+7fb4b86e4d6269f4cf4453b96ee40f8637628badedfecc9bb011079aebc3f33a  dist/debian/stm32mp2-tsn-deip-dkms_1.6.8-1_all.deb
+ff1c80ba6e63fbbc7ab2d47ea8cd91dd2c86ef90bb62f282ea12a749d41beb12  dist/debian/stm32mp2-tsn-deptp_1.6.7+2.5.2+20240628-1_arm64.deb
+cb00d1bf4a8407e03d23ea7b5fc7c4c8a15b7b3e6e7ea5279cf2944f8b1e295f  dist/debian/stm32mp2-tsn-edge-dev_1.6.8-1_all.deb
+0ae987f637006659440402538e4278c0363ef8c3aa3fb19f9e9328736e765a32  dist/debian/stm32mp2-tsn-edge-dkms_1.6.8-1_all.deb
+2929b555c82ef2b7a9f25e0302556839d7439034fd7f5875d72959d5641cc89e  dist/debian/stm32mp2-tsn-edge-runtime_1.6.8-1_all.deb
+cf51a754c627b2e1d59c0343a749bd1efa3911778190a4c4f990e0b1e5a9d091  dist/debian/stm32mp2-tsn-libtsn-dev_1.6.8-1_arm64.deb
+6f6232207d5fa7ae5209ebc8d2f934eaf73e34065a68556eeea36d02d263d939  dist/debian/stm32mp2-tsn-libtsn-staticdev_1.6.8-1_arm64.deb
+851cc52778271638961e8db63a5bee03622616cea953f540f6ac010f82672516  dist/debian/stm32mp2-tsn-libtsn_1.6.8-1_arm64.deb
+bcf29457b5155d7092178859ffc7518c1270bbe75ba69efc67337073b29b2d4e  dist/debian/stm32mp2-tsn-switch_1.6.8-1_arm64.deb
+f4d875f5275d4af781cd2a57000c1477a0dd3c191fe8379a7a8a7ffae2d299af  dist/debian/stm32mp2-tsntool_1.6.8-1_arm64.deb

@@ -43,6 +43,14 @@ modules and the board configuration. When the manual workflow enables
 `stm32mp257-tsn-acm` remains separate because a Switch-enabled FDT does not by
 itself prove that the ACM hardware node and board resources are available.
 
+For user-space builds, the upstream revisions are deliberately fixed to the
+OpenSTLinux scarthgap recipes: `tsntool_release` is `1.6.8`, while
+`de-ptp-bin_release` is the independent `1.6.7-2.5.2-2024-06-28` vendor
+release. Consequently, `include_userspace=true` requires `tsn_version=1.6.8`;
+the resulting DE-PTP Debian package is versioned
+`1.6.7+2.5.2+20240628-<revision>`. Local `build-userspace.sh` and
+`build-all.sh` invocations must explicitly pass `--accept-deptp-eula true`.
+
 ## What is intentionally not packaged as a generic Debian service
 
 The ST layer includes rootfs automation, systemd-networkd configuration,

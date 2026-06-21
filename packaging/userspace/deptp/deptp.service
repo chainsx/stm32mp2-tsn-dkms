@@ -1,15 +1,12 @@
 [Unit]
-Description=TTTech DE-gPTP daemon for STM32MP257 TSN Switch
-After=network-online.target
-Wants=network-online.target
-ConditionPathExists=/etc/deptp/ptp_config.xml
+Description=DE-gPTP Edge daemon
+After=network.target
+Wants=network.target
 
 [Service]
-Type=simple
-PIDFile=/run/deptp.pid
+PIDFile=/var/run/deptp.pid
 ExecStart=/usr/sbin/deptp /etc/deptp/ptp_config.xml
-Restart=on-failure
-RestartSec=2
+
 
 [Install]
 WantedBy=multi-user.target

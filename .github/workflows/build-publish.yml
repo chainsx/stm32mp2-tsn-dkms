@@ -4,7 +4,7 @@ name: Build and publish STM32MP257 TSN packages for Debian 13
   workflow_dispatch:
     inputs:
       tsn_version:
-        description: "TSN upstream version embedded in Debian package versions"
+        description: "OpenSTLinux tsntool PV; must remain 1.6.8 whenever include_userspace is true"
         required: true
         default: "1.6.8"
         type: string
@@ -123,6 +123,7 @@ jobs:
         run: |
           test '${{ inputs.accept_tttech_license }}' = true || { echo 'TTTech/ST license acknowledgement is required for user-space packages.' >&2; exit 1; }
           test '${{ inputs.confirm_public_redistribution_rights }}' = true || { echo 'Public redistribution acknowledgement is required for user-space packages.' >&2; exit 1; }
+          test '${{ inputs.tsn_version }}' = 1.6.8 || { echo 'OpenSTLinux scarthgap tsntool user-space packaging is pinned to 1.6.8.' >&2; exit 1; }
 
       - name: Build inside Debian GNU/Linux 13 arm64
         shell: bash
@@ -151,6 +152,7 @@ jobs:
                 --revision "${{ inputs.package_revision }}" \
                 --out dist/debian \
                 --with-acm "${{ inputs.include_acm }}" \
+                --accept-deptp-eula true \
                 --maintainer "${{ github.repository_owner }} <${{ github.repository_owner }}@users.noreply.github.com>"
             '
 

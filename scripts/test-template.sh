@@ -27,8 +27,42 @@ for p in (
     assert 'Debian GNU/Linux 13' in p.read_text() or p.name == 'build-dkms.sh'
 assert 'BUILD_EXCLUSIVE_ARCH="^(aarch64|arm64)$"' in Path('packaging/dkms/deip/dkms.conf.in').read_text()
 assert 'BUILD_EXCLUSIVE_ARCH="^(aarch64|arm64)$"' in Path('packaging/dkms/edge/dkms.conf.in').read_text()
-assert 'SYSTEMD_AUTO_ENABLE' not in Path('packaging/userspace/deptp/deptp.service').read_text()
-assert 'ConditionPathExists=/etc/deptp/ptp_config.xml' in Path('packaging/userspace/deptp/deptp.service').read_text()
+userspace = Path('scripts/build-userspace.sh').read_text()
+for needle in (
+    "TSNTOOL_OPENSTLINUX_PV='1.6.8'",
+    "DEPTP_OPENSTLINUX_PV='1.6.7+2.5.2+20240628'",
+    "DEPTP_INSTALLER='TTTECH-de-ptp-aarch64-2024-06-28.bin'",
+    'make -C "$tool_src" -e clean',
+    'make -C "$tool_src" -e all',
+    'make -C "$tool_src" -e install DESTDIR="$stage"',
+    '--accept-deptp-eula true',
+):
+    assert needle in userspace, needle
+service = Path('packaging/userspace/deptp/deptp.service').read_text()
+assert service == """[Unit]
+Description=DE-gPTP Edge daemon
+After=network.target
+Wants=network.target
+
+[Service]
+PIDFile=/var/run/deptp.pid
+ExecStart=/usr/sbin/deptp /etc/deptp/ptp_config.xml
+
+
+[Install]
+WantedBy=multi-user.target
+"""
+config = Path('packaging/userspace/deptp/ptp_config.xml').read_text()
+assert '<PTP_config xmlns="http://flexibilis.com/schema/ptp/1.0/config">' in config
+assert '<Interface name="sw0p2">' in config
+assert '<Interface name="sw0p3">' in config
+assert '<time_source>internal oscillator</time_source>' in config
+assert config.count('\n') == 28
+meta = Path('scripts/build-meta.sh').read_text()
+assert "DEPTP_OPENSTLINUX_PV='1.6.7+2.5.2+20240628'" in meta
+assert 'stm32mp257-tsn-deptp (= ${deptp_deb_ver})' in meta
+workflow = Path('.github/workflows/build-publish.yml').read_text()
+assert '--accept-deptp-eula true' in workflow
 PY
 
 work="$(mktemp -d)"; trap 'rm -rf "$work"' EXIT
@@ -74,5 +108,16 @@ grep -q 'sched=fsc sid=sid' "$work/edge/usr/src/stm32mp257-tsn-edge-1.6.8+deb7/d
 dpkg-deb -e "$work/out/stm32mp257-tsn-edge-dkms_1.6.8-7_all.deb" "$work/edge-control"
 grep -q 'dkms build' "$work/edge-control/postinst"
 ! grep -q '|| true' "$work/edge-control/postinst"
+
+"$ROOT/scripts/build-meta.sh" \
+  --version 1.6.8 \
+  --revision 7 \
+  --out "$work/userspace-meta" \
+  --with-userspace true \
+  --with-acm false \
+  --maintainer 'Test <test@example.invalid>'
+dpkg-deb -f "$work/userspace-meta/stm32mp257-tsn-switch_1.6.8-7_arm64.deb" Depends | grep -q 'stm32mp257-tsn-libtsn (= 1.6.8-7)'
+dpkg-deb -f "$work/userspace-meta/stm32mp257-tsn-switch_1.6.8-7_arm64.deb" Depends | grep -q 'stm32mp257-tsntool (= 1.6.8-7)'
+dpkg-deb -f "$work/userspace-meta/stm32mp257-tsn-switch_1.6.8-7_arm64.deb" Depends | grep -q 'stm32mp257-tsn-deptp (= 1.6.7+2.5.2+20240628-7)'
 
 echo 'Debian 13 TSN template checks passed.'

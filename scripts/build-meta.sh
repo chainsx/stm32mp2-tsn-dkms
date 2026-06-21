@@ -3,6 +3,9 @@ set -Eeuo pipefail
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 . "$SCRIPT_DIR/lib.sh"
 
+# de-ptp-bin_release.bb has an independent PV from tsntool_release.bb.
+readonly DEPTP_OPENSTLINUX_PV='1.6.7+2.5.2+20240628'
+
 version= revision=1 out_dir=dist/debian
 maintainer='STM32MP257 TSN Packaging <noreply@example.invalid>' with_userspace=false with_acm=false
 usage() {
@@ -33,6 +36,7 @@ need dpkg-deb
 work="$(mktemp -d)"; trap 'rm -rf "$work"' EXIT
 mkdir -p "$out_dir"
 deb_ver="$(deb_version "$version" "$revision")"
+deptp_deb_ver="$(deb_version "$DEPTP_OPENSTLINUX_PV" "$revision")"
 
 make_meta() {
   local package=$1 depends=$2 description=$3 root
@@ -51,7 +55,7 @@ DOC
 
 base="stm32mp257-tsn-deip-dkms (= ${deb_ver}), stm32mp257-tsn-edge-dkms (= ${deb_ver}), stm32mp257-tsn-edge-runtime (= ${deb_ver})"
 if [[ "$with_userspace" == true ]]; then
-  base+=", stm32mp257-tsn-libtsn (= ${deb_ver}), stm32mp257-tsntool (= ${deb_ver}), stm32mp257-tsn-deptp (= ${deb_ver})"
+  base+=", stm32mp257-tsn-libtsn (= ${deb_ver}), stm32mp257-tsntool (= ${deb_ver}), stm32mp257-tsn-deptp (= ${deptp_deb_ver})"
 fi
 make_meta stm32mp257-tsn-switch "$base" 'STM32MP257 Ethernet Switch / TSN base stack'
 if [[ "$with_acm" == true ]]; then

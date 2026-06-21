@@ -10,7 +10,7 @@
 | `tsntool_release`: `libtsn-dev` | `stm32mp257-tsn-libtsn-dev` | `include/libtsn/*.h` plus unversioned `lib*.so` | Exact version dependency on the runtime package. |
 | `tsntool_release`: `libtsn-staticdev` | `stm32mp257-tsn-libtsn-staticdev` | `lib*.a` split | Created only when the upstream install actually contains a static archive. |
 | `tsntool_release` CLI | `stm32mp257-tsntool` | `/usr/bin/tsntool` and man page | Exact runtime library dependency. |
-| `de-ptp-bin_release` | `stm32mp257-tsn-deptp` | Vendor AArch64 payload; service and `ptp_config.xml` | The service is shipped but not enabled; XML is a conffile; all ELF dependencies must resolve on Debian 13 arm64. |
+| `de-ptp-bin_release` | `stm32mp257-tsn-deptp` | Fixed `TTTECH-de-ptp-aarch64-2024-06-28.bin` AArch64 payload; service and `ptp_config.xml` | The Debian version maps the distinct OpenSTLinux PV to `1.6.7+2.5.2+20240628-<revision>`; the service is shipped but not enabled; XML is a conffile; all ELF dependencies must resolve on Debian 13 arm64. |
 | `kernel-module-tsn-acm` | `stm32mp257-tsn-acm-dkms` | Optional `acm.ko` | Disabled from the default Switch meta-package. |
 | `libacmconfig` | `stm32mp257-tsn-acm-config` | Optional ACM user-space payload | Full staged payload is preserved; unresolved ELF dependencies abort the build. |
 | TSN rootfs initialization, sysrepo/Netopeer, lldpd, mstpd | not bundled | OpenSTLinux image-level integration | Excluded intentionally: network topology and board policy are not generic Debian package defaults. |

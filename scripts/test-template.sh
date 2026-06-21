@@ -66,6 +66,44 @@ assert '--accept-deptp-eula true' in workflow
 PY
 
 work="$(mktemp -d)"; trap 'rm -rf "$work"' EXIT
+
+# Debian 13 is usrmerged. ldd can report /lib/aarch64-linux-gnu/libc.so.6,
+# while dpkg-query records its owner under /usr/lib/aarch64-linux-gnu.
+# Exercise the canonical-path fallback without requiring an arm64 host.
+runtime_test="$work/runtime-deps"
+mkdir -p "$runtime_test/root" "$runtime_test/bin"
+: > "$runtime_test/root/libmock.so"
+cat > "$runtime_test/bin/file" <<'EOF'
+#!/bin/sh
+printf '%s\n' 'ELF 64-bit LSB shared object, ARM aarch64'
+EOF
+cat > "$runtime_test/bin/ldd" <<'EOF'
+#!/bin/sh
+printf '%s\n' 'libc.so.6 => /lib/aarch64-linux-gnu/libc.so.6 (0x0000000000000000)'
+EOF
+cat > "$runtime_test/bin/readlink" <<'EOF'
+#!/bin/sh
+printf '%s\n' '/usr/lib/aarch64-linux-gnu/libc.so.6'
+EOF
+cat > "$runtime_test/bin/dpkg-query" <<'EOF'
+#!/bin/sh
+for arg do last=$arg; done
+[ "$last" = '/usr/lib/aarch64-linux-gnu/libc.so.6' ] || exit 1
+printf '%s\n' 'libc6:arm64: /usr/lib/aarch64-linux-gnu/libc.so.6'
+EOF
+chmod 0755 "$runtime_test/bin/"*
+runtime_deps="$(
+  PATH="$runtime_test/bin:$PATH" bash -c '
+    set -Eeuo pipefail
+    . "$1"
+    debian_runtime_dependencies "$2"
+  ' _ "$ROOT/scripts/lib.sh" "$runtime_test/root"
+)"
+[[ "$runtime_deps" == libc6 ]] || {
+  echo "usrmerge runtime-dependency ownership resolution failed: $runtime_deps" >&2
+  exit 1
+}
+
 mkdir -p \
   "$work/upstream/switch/st.stm32-deip" \
   "$work/upstream/switch/tsn_sw_base.edge-lkm" \

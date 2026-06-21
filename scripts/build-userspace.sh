@@ -46,7 +46,7 @@ valid_version "$version"; valid_revision "$revision"; valid_bool "$with_acm"; va
 [[ "$version" == "$TSNTOOL_OPENSTLINUX_PV" ]] || die "OpenSTLinux scarthgap tsntool is pinned to $TSNTOOL_OPENSTLINUX_PV; got $version"
 [[ "$accept_deptp_eula" == true ]] || die 'DE-PTP requires explicit EULA acceptance: pass --accept-deptp-eula true'
 [[ "$(dpkg --print-architecture)" == arm64 ]] || die 'user-space packages must be built in a Debian 13 arm64 environment'
-need dpkg-deb; need dpkg-query; need file; need find; need ldd; need make; need readelf; need sh; need sync
+need dpkg-deb; need dpkg-query; need file; need find; need ldd; need make; need readelf; need readlink; need sh; need sync
 mkdir -p "$out_dir"
 work="$(mktemp -d)"; trap 'rm -rf "$work"' EXIT
 tsntool_deb_ver="$(deb_version "$TSNTOOL_OPENSTLINUX_PV" "$revision")"

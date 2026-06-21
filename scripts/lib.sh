@@ -179,7 +179,7 @@ debian_runtime_dependencies() {
   # This is intentionally evaluated inside the Debian 13 arm64 build container.
   local root=$1
   shift
-  local owned_dirs=("$@") elf output line path owner
+  local owned_dirs=("$@") elf output line path canonical_path owner
   local -A seen=()
   while IFS= read -r -d '' elf; do
     file -b "$elf" | grep -q 'ELF 64-bit.*aarch64' || continue
@@ -196,7 +196,18 @@ debian_runtime_dependencies() {
         [[ -n "$d" && "$path" == "$d"/* ]] && { owned=true; break; }
       done
       "$owned" && continue
-      owner="$(dpkg-query -S -- "$path" 2>/dev/null | head -n1 | cut -d: -f1 || true)"
+      # Debian 13 uses usrmerge: ldd may report /lib/... while dpkg's file
+      # database records the same object below /usr/lib/....  Resolve the
+      # dependency before querying ownership, then retain the original path as
+      # a fallback for non-symlinked loader paths.
+      canonical_path="$(readlink -f -- "$path" 2>/dev/null || true)"
+      owner=
+      if [[ -n "$canonical_path" ]]; then
+        owner="$(dpkg-query -S -- "$canonical_path" 2>/dev/null | head -n1 | cut -d: -f1 || true)"
+      fi
+      if [[ -z "$owner" && "$canonical_path" != "$path" ]]; then
+        owner="$(dpkg-query -S -- "$path" 2>/dev/null | head -n1 | cut -d: -f1 || true)"
+      fi
       [[ -n "$owner" ]] || die "cannot map runtime dependency $path of $elf to a Debian 13 package"
       seen["$owner"]=1
     done <<<"$output"

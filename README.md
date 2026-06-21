@@ -117,8 +117,22 @@ EOF2
 
 ```bash
 sudo apt update
-sudo apt install stm32mp2-tsn*
+sudo apt install stm32mp2-tsn-switch
 ```
+
+Do **not** install `stm32mp2-tsn*` with an APT glob. That pattern also selects
+the optional ACM stack, development headers, and static library packages. Install
+ACM only after its device-tree node and board resources are validated:
+
+```bash
+sudo apt install stm32mp2-tsn-acm
+```
+
+DKMS package removal is transactional: the package removes its DKMS registration
+in `prerm`, while its `/usr/src` tree is still present. If a build or install
+fails, `postinst` removes the partial DKMS registration before returning an
+error; this prevents a later `apt purge` from being blocked by a missing DKMS
+source-directory symlink.
 
 ### Migration from the legacy package prefix
 

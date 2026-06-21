@@ -1,0 +1,27 @@
+#!/bin/sh
+set -eu
+
+module='@MODULE_NAME@'
+version='@DKMS_VERSION@'
+dkms_state="/var/lib/dkms/$module/$version"
+
+# prerm runs while /usr/src/<module>-<version> still exists.  This is the only
+# safe point to call `dkms remove`: postrm runs after dpkg has removed that
+# source tree and DKMS otherwise reports the module as broken.
+cleanup_dkms_state() {
+  if [ -e "$dkms_state" ] || dkms status -m "$module" -v "$version" >/dev/null 2>&1; then
+    if ! dkms remove -m "$module" -v "$version" --all; then
+      echo "warning: DKMS could not remove $module/$version; removing stale DKMS state" >&2
+      rm -rf -- "$dkms_state"
+    fi
+  fi
+}
+
+case "${1:-}" in
+  remove|upgrade|deconfigure)
+    cleanup_dkms_state
+    depmod -a "$(uname -r)" || true
+    ;;
+esac
+
+exit 0

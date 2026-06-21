@@ -1,13 +1,19 @@
 #!/bin/sh
 set -eu
+
 module='@MODULE_NAME@'
 version='@DKMS_VERSION@'
+dkms_state="/var/lib/dkms/$module/$version"
+
 case "${1:-}" in
-  remove|purge)
-    if dkms status -m "$module" -v "$version" >/dev/null 2>&1; then
-      dkms remove -m "$module" -v "$version" --all
-    fi
-    depmod -a "$(uname -r)"
+  remove|purge|upgrade|failed-upgrade|disappear)
+    # prerm removes a healthy registration before dpkg deletes /usr/src.  Do
+    # not call `dkms remove` here: a partially configured package may already
+    # have a missing source directory.  Deleting only this package's residual
+    # state keeps purge/recovery non-blocking.
+    rm -rf -- "$dkms_state"
+    depmod -a "$(uname -r)" || true
     ;;
 esac
+
 exit 0

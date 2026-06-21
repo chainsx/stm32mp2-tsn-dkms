@@ -161,7 +161,78 @@ dpkg-deb -x "$work/out/stm32mp2-tsn-edge-dkms_1.6.8-7_all.deb" "$work/edge"
 grep -q 'sched=fsc sid=sid' "$work/edge/usr/src/stm32mp2-tsn-edge-1.6.8+deb7/dkms.conf"
 dpkg-deb -e "$work/out/stm32mp2-tsn-edge-dkms_1.6.8-7_all.deb" "$work/edge-control"
 grep -q 'dkms build' "$work/edge-control/postinst"
-! grep -q '|| true' "$work/edge-control/postinst"
+grep -q 'cleanup_dkms_state' "$work/edge-control/postinst"
+grep -q 'cleanup_dkms_state' "$work/edge-control/prerm"
+grep -q 'remove|upgrade|deconfigure' "$work/edge-control/prerm"
+grep -q 'dkms remove' "$work/edge-control/prerm"
+if grep -Eq '^[[:space:]]*dkms remove[[:space:]]' "$work/edge-control/postrm"; then
+  echo "postrm must not invoke dkms remove after dpkg deletes /usr/src" >&2
+  exit 1
+fi
+grep -q 'rm -rf -- "$dkms_state"' "$work/edge-control/postrm"
+
+# Simulate a failed configure and a broken DKMS removal without touching the
+# host's /usr/src or /var/lib/dkms. The generated scripts must clean the state
+# in postinst/prerm, while postrm must never invoke dkms after package files
+# have been removed.
+lifecycle="$work/dkms-lifecycle"
+mkdir -p "$lifecycle/src" "$lifecycle/bin"
+for hook in postinst prerm postrm; do
+  sed \
+    -e "s|^source_dir=.*|source_dir='$lifecycle/src'|" \
+    -e "s|^dkms_state=.*|dkms_state='$lifecycle/state'|" \
+    "$work/edge-control/$hook" > "$lifecycle/$hook"
+  chmod 0755 "$lifecycle/$hook"
+done
+cat > "$lifecycle/bin/dkms" <<'EOF'
+#!/bin/sh
+set -eu
+case "$1" in
+  status) [ -e "$DKMS_TEST_STATE" ] && exit 0 || exit 1 ;;
+  add) mkdir -p "$DKMS_TEST_STATE" ;;
+  build) exit 1 ;;
+  install) exit 0 ;;
+  remove) rm -rf -- "$DKMS_TEST_STATE" ;;
+esac
+EOF
+cat > "$lifecycle/bin/depmod" <<'EOF'
+#!/bin/sh
+exit 0
+EOF
+cat > "$lifecycle/bin/uname" <<'EOF'
+#!/bin/sh
+printf '%s\n' testkernel
+EOF
+chmod 0755 "$lifecycle/bin/"*
+if PATH="$lifecycle/bin:$PATH" DKMS_TEST_STATE="$lifecycle/state" "$lifecycle/postinst" configure; then
+  echo "postinst unexpectedly succeeded in the forced-failure test" >&2
+  exit 1
+fi
+[[ ! -e "$lifecycle/state" ]] || {
+  echo "failed postinst left DKMS state behind" >&2
+  exit 1
+}
+mkdir -p "$lifecycle/state"
+cat > "$lifecycle/bin/dkms" <<'EOF'
+#!/bin/sh
+case "$1" in
+  status) exit 0 ;;
+  remove) exit 4 ;;
+esac
+exit 0
+EOF
+chmod 0755 "$lifecycle/bin/dkms"
+PATH="$lifecycle/bin:$PATH" DKMS_TEST_STATE="$lifecycle/state" "$lifecycle/prerm" remove
+[[ ! -e "$lifecycle/state" ]] || {
+  echo "prerm did not remove broken DKMS state" >&2
+  exit 1
+}
+mkdir -p "$lifecycle/state"
+PATH="$lifecycle/bin:$PATH" DKMS_TEST_STATE="$lifecycle/state" "$lifecycle/postrm" remove
+[[ ! -e "$lifecycle/state" ]] || {
+  echo "postrm did not remove residual DKMS state" >&2
+  exit 1
+}
 
 dpkg-deb -x "$work/out/stm32mp2-tsn-acm-dkms_1.6.8-7_all.deb" "$work/acm"
 acm_src="$work/acm/usr/src/stm32mp2-tsn-acm-1.6.8+deb7"

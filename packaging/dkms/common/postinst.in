@@ -1,8 +1,11 @@
 #!/bin/sh
 set -eu
+
 module='@MODULE_NAME@'
 version='@DKMS_VERSION@'
 source_dir='/usr/src/@SOURCE_PACKAGE@-@DKMS_VERSION@'
+dkms_state="/var/lib/dkms/$module/$version"
+
 show_log() {
   log="/var/lib/dkms/$module/$version/build/make.log"
   if [ -r "$log" ]; then
@@ -11,26 +14,50 @@ show_log() {
     echo "-------------------" >&2
   fi
 }
+
+# A failed DKMS build leaves a registration under /var/lib/dkms.  Remove it
+# before returning an error so that a subsequent dpkg purge never invokes DKMS
+# after dpkg has deleted /usr/src/<module>-<version>.
+cleanup_dkms_state() {
+  if [ -e "$dkms_state" ] || dkms status -m "$module" -v "$version" >/dev/null 2>&1; then
+    if ! dkms remove -m "$module" -v "$version" --all; then
+      echo "warning: DKMS could not remove $module/$version; removing stale DKMS state" >&2
+      rm -rf -- "$dkms_state"
+    fi
+  fi
+}
+
+fail_dkms() {
+  show_log
+  cleanup_dkms_state
+  echo "$1" >&2
+  exit 1
+}
+
 case "${1:-}" in
   configure)
     if [ ! -d "$source_dir" ]; then
+      cleanup_dkms_state
       echo "DKMS source directory is missing: $source_dir" >&2
       exit 1
     fi
+
     if ! dkms status -m "$module" -v "$version" >/dev/null 2>&1; then
-      dkms add -m "$module" -v "$version"
+      if ! dkms add -m "$module" -v "$version"; then
+        fail_dkms "DKMS add failed."
+      fi
     fi
+
     if ! dkms build -m "$module" -v "$version" -k "$(uname -r)"; then
-      show_log
-      echo "DKMS build failed. Install matching linux-headers-$(uname -r) and inspect the log above." >&2
-      exit 1
+      fail_dkms "DKMS build failed. Install matching linux-headers-$(uname -r) and inspect the log above."
     fi
+
     if ! dkms install -m "$module" -v "$version" -k "$(uname -r)" --force; then
-      show_log
-      echo "DKMS installation failed." >&2
-      exit 1
+      fail_dkms "DKMS installation failed."
     fi
+
     depmod -a "$(uname -r)"
     ;;
 esac
+
 exit 0

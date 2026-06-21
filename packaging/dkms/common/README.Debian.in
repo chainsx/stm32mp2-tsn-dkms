@@ -8,3 +8,8 @@ are mandatory:
 A failed DKMS build is intentionally fatal and leaves the compiler log at:
 
   /var/lib/dkms/@MODULE_NAME@/@DKMS_VERSION@/build/make.log
+
+The failed registration is removed before the package reports the failure. During
+removal or upgrade, DKMS is removed from the package prerm script while this
+package's /usr/src tree still exists. This prevents a broken DKMS symlink from
+blocking a later apt purge.

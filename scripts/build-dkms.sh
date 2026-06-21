@@ -48,8 +48,12 @@ write_dkms_scripts() {
   sed \
     -e "s|@MODULE_NAME@|$source_package|g" \
     -e "s|@DKMS_VERSION@|$dkms_ver|g" \
+    "$ROOT/packaging/dkms/common/prerm.in" > "$root/DEBIAN/prerm"
+  sed \
+    -e "s|@MODULE_NAME@|$source_package|g" \
+    -e "s|@DKMS_VERSION@|$dkms_ver|g" \
     "$ROOT/packaging/dkms/common/postrm.in" > "$root/DEBIAN/postrm"
-  chmod 0755 "$root/DEBIAN/postinst" "$root/DEBIAN/postrm"
+  chmod 0755 "$root/DEBIAN/postinst" "$root/DEBIAN/prerm" "$root/DEBIAN/postrm"
 }
 
 package_module() {

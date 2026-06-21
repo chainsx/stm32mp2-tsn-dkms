@@ -70,10 +70,10 @@ make -C "$tool_src" TSNTOOL_VERSION="$version" install DESTDIR="$stage"
 [[ -x "$stage/usr/bin/tsntool" ]] || die 'tsntool install did not produce /usr/bin/tsntool'
 assert_only_paths "$stage" \
   '^/usr/bin/tsntool$' \
-  '^/usr/share/man/man8/tsntool\\.8(\\.gz)?$' \
-  '^/usr/(lib|lib64|lib/aarch64-linux-gnu)/lib[^/]+\\.so(\\..+)?$' \
-  '^/usr/(lib|lib64|lib/aarch64-linux-gnu)/lib[^/]+\\.a$' \
-  '^/usr/include/libtsn/[^/]+\\.h$'
+  '^/usr/share/man/man8/tsntool\.8(\.gz)?$' \
+  '^/usr/(lib|lib64|lib/aarch64-linux-gnu)/lib[^/]+\.so(\..+)?$' \
+  '^/usr/(lib|lib64|lib/aarch64-linux-gnu)/lib[^/]+\.a$' \
+  '^/usr/include/libtsn/[^/]+\.h$'
 
 libroot="$work/libtsn"
 mkdir -p "$libroot/DEBIAN"

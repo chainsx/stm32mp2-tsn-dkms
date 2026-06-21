@@ -4,34 +4,34 @@ Hash: SHA512
 Architectures: arm64 all
 Codename: ./
 Components: main
-Date: Sat, 20 Jun 2026 17:25:21 +0000
-Label: STM32MP257 TSN APT Archive
+Date: Sun, 21 Jun 2026 11:03:09 +0000
+Label: STM32MP2 TSN APT Archive for Debian 13
 Origin: chainsx/stm32mp2-tsn-dkms
 Suite: ./
 MD5Sum:
- ace6e9bee52d75b008ac02b10af5cdd2             7792 Packages
- 587564affab90696c7863ffa65ba43bb             2653 Packages.gz
- 5bda5cfc9b106a52d364cf0827ce8cd9             2500 Packages.xz
- c1a62fb82720cbb07b9cd9db17c8d26c              171 Release
+ b08995002de43322e9a9c4729e264563            10410 Packages
+ 7e553ed09f9259dc43bfed1caa158c58             3415 Packages.gz
+ 00bd24b0e58593f598cb42aea22fbeec             3172 Packages.xz
+ 715eafd05b383a7d4b072121b2d67b9d              183 Release
 SHA1:
- de8500a08f242b36198e2379d6410e56d75526be             7792 Packages
- c37aaf60fc24ea420d15c5b9a1a12e2af83dc5fb             2653 Packages.gz
- d87499d9dfe3aa714f00d66cea57af6a6538ac30             2500 Packages.xz
- 35c58bc96bbbc1b93604b826a9a1aa6705a9d216              171 Release
+ 0d57cd580168fcfa79154cbf8f7aee9160009fb0            10410 Packages
+ 1bfb79e3fe36b0d14de62d742fd28649f02b58ea             3415 Packages.gz
+ d4e583a033431802ca870d755ad820e55620d471             3172 Packages.xz
+ cb98c1c98e58607d80ba09cad4451181f19a876f              183 Release
 SHA256:
- 466485c0e72018707d2ada2fdc1273aed5e08553f8b31a4f2bc05e89a4c99eba             7792 Packages
- 46aed95708c3520bd3a31263a3427e55509ca184baa040cba6f2a91b196a9892             2653 Packages.gz
- 6b7f8748a1c355196149182762909864a3a79fe25d680333d551fca84f728f66             2500 Packages.xz
- ee7d4d971fa648e8e7d59e612e567baae8fb31de0107b2f3c32e8cb2574c46e5              171 Release
+ 881007736945934ddc97723139225f11366c0a213b4fbe9854e210f9e1ce2083            10410 Packages
+ 7ef6254e0495318f3734e688518c9411839be62431f5be725377b1f54677746f             3415 Packages.gz
+ 06a1c4a83082eb8fbd797d40c450bc9517b05ce73a0c5e8be052bd3e88b60e45             3172 Packages.xz
+ 11f13ec0069262f7737a663fbee350a979487291cb17f81e533565b51f0ae496              183 Release
 SHA512:
- 38cf3492358b3514dd1b6b56144d6329bfd01573b2e1f2a7dd69b25bf25d31eee59973a9def582be28531d3e51e22f07c3753236bed094dcd2d12d81cd5b301a             7792 Packages
- 8a4c29204cb2e148e2a424598bf67220bba662566a454eb869b249e3189f3bcbc92e09d0d1b0c306bd5eae9b27159bcbef19300998e11c17916d7dfdd80df8ae             2653 Packages.gz
- a901e0a897501468325d0490914d89040041a69973a5dc5602ca07e94ac16577e153a19456d4995968dd899c4ffb7e5c8e50c77aa79b634d790c565c80c08ab4             2500 Packages.xz
- f1880ed12aa9b8f4759002b7240a987ba40255d560d4fd5e05dd551c2e99fb6722a3b5537a952b15fb1def2e7b741bf8884a86473823683c303f89fe004f6a1d              171 Release
+ b15bd7558149dfc3cc7d368f2dd241efcc8e4d5cc3fe89c7d3a8a33be58b0c48e102713b7fa91db3822ad22107f1f5e3a6e3c7bdfc10bd08af1912307a2d0499            10410 Packages
+ 5b3686c1369681351e2820d76e93b858cf990a52ae197f9cdddcae8e8b2bc900d4213564bcf5e47497e9a89d60b2549bd70a46b674fffa2306abeca20bd0d450             3415 Packages.gz
+ 7384b4833c6d87721dee3f97494381aec5f42460a5e5f7d64e74422bf667211a43fbe00a69dbdbe9c6f61e84f2928ba1ec6dc369260186db371fa5d3501cc8bb             3172 Packages.xz
+ 5d46228c73b857f6ddca9c5b86c1fee0864fcbafdc4b75b74cdd01bb9e8d3eaa898e0cd9332f85878139e2d5b878c5f36aa1884e4007a2454a624231e3334178              183 Release
 -----BEGIN PGP SIGNATURE-----
 
-iHUEARYKAB0WIQSdVFv1G1p4w7lxaQ3W1aWx9fr/MwUCajbNAQAKCRDW1aWx9fr/
-M24eAP9VeTF/Dsc12yDn9VC/OV6sBIMyOZPaXNGryZ3zmznkJwD9G9YZz6Q0/kSQ
-Kmq2Co/7YEB70BSZ5hdRoiscuOCBcAA=
-=8nSB
+iHUEARYKAB0WIQSdVFv1G1p4w7lxaQ3W1aWx9fr/MwUCajfE7QAKCRDW1aWx9fr/
+MxCrAP4tn908c/xZIo+yOXxe1tmQ1PEXHuwj7hJ7AUroMTCY1gD+JP9WiL0sBhAk
+f3roA7BdEWBVqJdeszLbjm+On0bZeQI=
+=FcQR
 -----END PGP SIGNATURE-----

@@ -1,4 +1,4 @@
-PACKAGE_NAME="stm32mp257-tsn-edge"
+PACKAGE_NAME="stm32mp2-tsn-edge"
 PACKAGE_VERSION="@DKMS_VERSION@"
 BUILT_MODULE_NAME[0]="edgx_pfm_lkm"
 DEST_MODULE_LOCATION[0]="/updates/dkms"

@@ -16,7 +16,7 @@ through `DEFAULT_ETHERNET_MAIN_TSN_BRIDGE_INTERFACE`. This Debian 13 package
 mirrors that behaviour with:
 
 ```text
-/etc/modprobe.d/stm32mp257-tsn-edge.conf
+/etc/modprobe.d/stm32mp2-tsn-edge.conf
 ```
 
 Default content:

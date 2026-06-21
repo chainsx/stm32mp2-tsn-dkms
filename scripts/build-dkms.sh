@@ -60,6 +60,10 @@ package_module() {
   srcdst="$root/usr/src/${source_package}-${dkms_ver}"
   mkdir -p "$root/DEBIAN" "$srcdst" "$root/usr/share/doc/${source_package}-dkms"
   copy_tree_contents "$src" "$srcdst"
+  if [[ "$source_package" == stm32mp2-tsn-acm ]]; then
+    install -m 0755 "$ROOT/packaging/dkms/acm/build-with-edge-symvers.sh.in" \
+      "$srcdst/build-with-edge-symvers.sh"
+  fi
   sed \
     -e "s|@DKMS_VERSION@|$dkms_ver|g" \
     -e "s|@EDGE_DKMS_VERSION@|$dkms_ver|g" \
@@ -77,30 +81,30 @@ package_module() {
 
 # The make flags and runtime modprobe/module-load fragments match the
 # OpenSTLinux scarthgap kernel-module-st-stm32-deip and kernel-module-edge recipes.
-package_module stm32mp257-tsn-deip \
+package_module stm32mp2-tsn-deip \
   "$source_dir/switch/st.stm32-deip" \
   "$ROOT/packaging/dkms/deip/dkms.conf.in" \
   'STM32 DEIP glue kernel module (DKMS)'
 
-package_module stm32mp257-tsn-edge \
+package_module stm32mp2-tsn-edge \
   "$source_dir/switch/tsn_sw_base.edge-lkm" \
   "$ROOT/packaging/dkms/edge/dkms.conf.in" \
   'TTTech EDGE Ethernet Switch kernel module (DKMS)' \
-  "dkms (>= 3.0.0), build-essential, kmod, stm32mp257-tsn-deip-dkms (= $deb_ver)"
+  "dkms (>= 3.0.0), build-essential, kmod, stm32mp2-tsn-deip-dkms (= $deb_ver)"
 
 edge_src="$source_dir/switch/tsn_sw_base.edge-lkm"
 [[ -f "$edge_src/edge.h" ]] || die "OpenSTLinux EDGE header is missing: $edge_src/edge.h"
 edge_dev="$work/edge-dev"
-mkdir -p "$edge_dev/DEBIAN" "$edge_dev/usr/include/stm32mp257-tsn-edge"
-install -m 0644 "$edge_src/edge.h" "$edge_dev/usr/include/stm32mp257-tsn-edge/edge.h"
-write_debian13_preinst "$edge_dev/DEBIAN/preinst" stm32mp257-tsn-edge-dev
-write_control "$edge_dev/DEBIAN/control" stm32mp257-tsn-edge-dev "$deb_ver" all "stm32mp257-tsn-edge-dkms (= $deb_ver)" 'TTTech EDGE public kernel interface header' "$maintainer"
-build_deb "$edge_dev" "$out_dir/stm32mp257-tsn-edge-dev_${deb_ver}_all.deb"
+mkdir -p "$edge_dev/DEBIAN" "$edge_dev/usr/include/stm32mp2-tsn-edge"
+install -m 0644 "$edge_src/edge.h" "$edge_dev/usr/include/stm32mp2-tsn-edge/edge.h"
+write_debian13_preinst "$edge_dev/DEBIAN/preinst" stm32mp2-tsn-edge-dev
+write_control "$edge_dev/DEBIAN/control" stm32mp2-tsn-edge-dev "$deb_ver" all "stm32mp2-tsn-edge-dkms (= $deb_ver)" 'TTTech EDGE public kernel interface header' "$maintainer"
+build_deb "$edge_dev" "$out_dir/stm32mp2-tsn-edge-dev_${deb_ver}_all.deb"
 
 edge_root="$work/edge-runtime"
-mkdir -p "$edge_root/DEBIAN" "$edge_root/etc/modules-load.d" "$edge_root/etc/modprobe.d" "$edge_root/usr/share/doc/stm32mp257-tsn-edge-runtime"
+mkdir -p "$edge_root/DEBIAN" "$edge_root/etc/modules-load.d" "$edge_root/etc/modprobe.d" "$edge_root/usr/share/doc/stm32mp2-tsn-edge-runtime"
 # Exact module ordering is carried from edgx_sw_modload.conf.
-cat > "$edge_root/etc/modules-load.d/stm32mp257-tsn-edge.conf" <<'CONF'
+cat > "$edge_root/etc/modules-load.d/stm32mp2-tsn-edge.conf" <<'CONF'
 sch_mqprio
 sch_prio
 bridge
@@ -109,11 +113,11 @@ edgx_pfm_lkm
 CONF
 # The soft dependency is carried from edgx_sw_modprobe.conf. The per-board
 # netif option corresponds to DEFAULT_ETHERNET_MAIN_TSN_BRIDGE_INTERFACE in ST's layer.
-cat > "$edge_root/etc/modprobe.d/stm32mp257-tsn-edge.conf" <<CONF
+cat > "$edge_root/etc/modprobe.d/stm32mp2-tsn-edge.conf" <<CONF
 softdep edgx_pfm_lkm: stmmac stm32_deip
 options edgx_pfm_lkm netif="${edge_interface}:0"
 CONF
-cat > "$edge_root/usr/share/doc/stm32mp257-tsn-edge-runtime/README.Debian" <<DOC
+cat > "$edge_root/usr/share/doc/stm32mp2-tsn-edge-runtime/README.Debian" <<DOC
 This Debian 13 package mirrors OpenSTLinux EDGE module-load and modprobe
 configuration. The selected main TSN MAC is '${edge_interface}', giving the
 vendor module parameter netif="${edge_interface}:0".
@@ -121,34 +125,34 @@ vendor module parameter netif="${edge_interface}:0".
 Verify the name before rebooting:
   ip -br link
 
-To change it, edit /etc/modprobe.d/stm32mp257-tsn-edge.conf and reload EDGE.
+To change it, edit /etc/modprobe.d/stm32mp2-tsn-edge.conf and reload EDGE.
 DOC
 printf '%s\n%s\n' \
-  /etc/modules-load.d/stm32mp257-tsn-edge.conf \
-  /etc/modprobe.d/stm32mp257-tsn-edge.conf > "$edge_root/DEBIAN/conffiles"
-write_debian13_preinst "$edge_root/DEBIAN/preinst" stm32mp257-tsn-edge-runtime
-write_control "$edge_root/DEBIAN/control" stm32mp257-tsn-edge-runtime "$deb_ver" all "stm32mp257-tsn-edge-dkms (= $deb_ver), stm32mp257-tsn-deip-dkms (= $deb_ver), kmod" 'OpenSTLinux-aligned EDGE module-load and modprobe configuration' "$maintainer"
-build_deb "$edge_root" "$out_dir/stm32mp257-tsn-edge-runtime_${deb_ver}_all.deb"
+  /etc/modules-load.d/stm32mp2-tsn-edge.conf \
+  /etc/modprobe.d/stm32mp2-tsn-edge.conf > "$edge_root/DEBIAN/conffiles"
+write_debian13_preinst "$edge_root/DEBIAN/preinst" stm32mp2-tsn-edge-runtime
+write_control "$edge_root/DEBIAN/control" stm32mp2-tsn-edge-runtime "$deb_ver" all "stm32mp2-tsn-edge-dkms (= $deb_ver), stm32mp2-tsn-deip-dkms (= $deb_ver), kmod" 'OpenSTLinux-aligned EDGE module-load and modprobe configuration' "$maintainer"
+build_deb "$edge_root" "$out_dir/stm32mp2-tsn-edge-runtime_${deb_ver}_all.deb"
 
 if [[ "$with_acm" == true ]]; then
-  package_module stm32mp257-tsn-acm \
+  package_module stm32mp2-tsn-acm \
     "$source_dir/acm/ngn.ngn-dd" \
     "$ROOT/packaging/dkms/acm/dkms.conf.in" \
     'TTTech Acceleration Module kernel module (DKMS)' \
-    "dkms (>= 3.0.0), build-essential, kmod, stm32mp257-tsn-edge-dkms (= $deb_ver)"
+    "dkms (>= 3.0.0), build-essential, kmod, stm32mp2-tsn-edge-dkms (= $deb_ver)"
 
   acm_root="$work/acm-runtime"
-  mkdir -p "$acm_root/DEBIAN" "$acm_root/etc/modules-load.d" "$acm_root/etc/modprobe.d" "$acm_root/usr/share/doc/stm32mp257-tsn-acm-runtime"
-  printf '%s\n' acm > "$acm_root/etc/modules-load.d/stm32mp257-tsn-acm.conf"
-  printf '%s\n' 'softdep acm: stmmac stm32_deip edgx_pfm_lkm' > "$acm_root/etc/modprobe.d/stm32mp257-tsn-acm.conf"
-  cat > "$acm_root/usr/share/doc/stm32mp257-tsn-acm-runtime/README.Debian" <<'DOC'
+  mkdir -p "$acm_root/DEBIAN" "$acm_root/etc/modules-load.d" "$acm_root/etc/modprobe.d" "$acm_root/usr/share/doc/stm32mp2-tsn-acm-runtime"
+  printf '%s\n' acm > "$acm_root/etc/modules-load.d/stm32mp2-tsn-acm.conf"
+  printf '%s\n' 'softdep acm: stmmac stm32_deip edgx_pfm_lkm' > "$acm_root/etc/modprobe.d/stm32mp2-tsn-acm.conf"
+  cat > "$acm_root/usr/share/doc/stm32mp2-tsn-acm-runtime/README.Debian" <<'DOC'
 ACM is optional. Install this package only after validating that the deployed
 DTB/FDT contains the ACM device node and the required board resources.
 DOC
   printf '%s\n%s\n' \
-    /etc/modules-load.d/stm32mp257-tsn-acm.conf \
-    /etc/modprobe.d/stm32mp257-tsn-acm.conf > "$acm_root/DEBIAN/conffiles"
-  write_debian13_preinst "$acm_root/DEBIAN/preinst" stm32mp257-tsn-acm-runtime
-  write_control "$acm_root/DEBIAN/control" stm32mp257-tsn-acm-runtime "$deb_ver" all "stm32mp257-tsn-acm-dkms (= $deb_ver), stm32mp257-tsn-edge-runtime (= $deb_ver), kmod" 'ACM automatic load and module dependency configuration' "$maintainer"
-  build_deb "$acm_root" "$out_dir/stm32mp257-tsn-acm-runtime_${deb_ver}_all.deb"
+    /etc/modules-load.d/stm32mp2-tsn-acm.conf \
+    /etc/modprobe.d/stm32mp2-tsn-acm.conf > "$acm_root/DEBIAN/conffiles"
+  write_debian13_preinst "$acm_root/DEBIAN/preinst" stm32mp2-tsn-acm-runtime
+  write_control "$acm_root/DEBIAN/control" stm32mp2-tsn-acm-runtime "$deb_ver" all "stm32mp2-tsn-acm-dkms (= $deb_ver), stm32mp2-tsn-edge-runtime (= $deb_ver), kmod" 'ACM automatic load and module dependency configuration' "$maintainer"
+  build_deb "$acm_root" "$out_dir/stm32mp2-tsn-acm-runtime_${deb_ver}_all.deb"
 fi

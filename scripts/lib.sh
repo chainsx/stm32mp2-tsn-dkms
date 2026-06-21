@@ -24,7 +24,7 @@ Architecture: $arch
 Maintainer: $maintainer
 Depends: $depends
 Description: $description
- OpenSTLinux-aligned STM32MP257 TSN component for Debian GNU/Linux 13 (trixie) arm64.
+ OpenSTLinux-aligned STM32MP2 TSN component for Debian GNU/Linux 13 (trixie) arm64.
 CTRL
   for field in "$@"; do
     [[ -n "$field" ]] && printf '%s\n' "$field" >> "$path"

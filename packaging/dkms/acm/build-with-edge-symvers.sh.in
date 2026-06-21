@@ -1,0 +1,61 @@
+#!/bin/sh
+# SPDX-License-Identifier: GPL-2.0-only
+#
+# DKMS builds ACM and EDGE as separate external modules. The upstream ACM module
+# imports symbols exported by edgx_pfm_lkm, notably edgx_ktime_get_worker_ptp.
+# Rebuild EDGE for the selected kernel in an isolated directory and pass the
+# resulting Module.symvers to ACM modpost. This avoids relying on DKMS-internal
+# build-directory layout.
+set -eu
+
+kernel_source_dir=${1:?missing kernel source directory}
+edge_source_dir=${2:?missing EDGE DKMS source directory}
+script_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+acm_source_dir="$script_dir/acm"
+
+[ -d "$edge_source_dir" ] || {
+  echo "ACM DKMS requires the matching EDGE source directory: $edge_source_dir" >&2
+  exit 1
+}
+[ -f "$edge_source_dir/Makefile" ] || {
+  echo "ACM DKMS cannot find the EDGE Makefile: $edge_source_dir/Makefile" >&2
+  exit 1
+}
+[ -f "$acm_source_dir/Makefile" ] || {
+  echo "ACM DKMS cannot find the ACM Makefile: $acm_source_dir/Makefile" >&2
+  exit 1
+}
+
+work=$(mktemp -d "${TMPDIR:-/tmp}/stm32mp2-tsn-acm-edge.XXXXXX")
+cleanup() { rm -rf -- "$work"; }
+trap cleanup EXIT HUP INT TERM
+edge_build_dir="$work/edge"
+cp -a -- "$edge_source_dir/." "$edge_build_dir"
+
+# The vendor Makefiles query .git for a release string. DKMS packages omit .git,
+# so override those variables with empty command-line values and avoid Git lookups.
+(
+  cd -- "$edge_build_dir"
+  make \
+    KDIR="$kernel_source_dir" \
+    sched=fsc sid=sid \
+    GIT_COMMIT= \
+    all
+)
+
+edge_symvers="$edge_build_dir/Module.symvers"
+[ -s "$edge_symvers" ] || {
+  echo "EDGE build did not produce Module.symvers: $edge_symvers" >&2
+  exit 1
+}
+grep -Eq '(^|[[:space:]])edgx_ktime_get_worker_ptp([[:space:]]|$)' "$edge_symvers" || {
+  echo "EDGE Module.symvers does not export edgx_ktime_get_worker_ptp" >&2
+  exit 1
+}
+
+make -C "$acm_source_dir" \
+  KDIR="$kernel_source_dir" \
+  FLX_MODULE_PATH="$edge_build_dir" \
+  ACM_DRIVER_VERSION= \
+  KBUILD_EXTRA_SYMBOLS="$edge_symvers" \
+  all

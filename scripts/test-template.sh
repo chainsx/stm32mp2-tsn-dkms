@@ -60,9 +60,25 @@ assert '<time_source>internal oscillator</time_source>' in config
 assert config.count('\n') == 28
 meta = Path('scripts/build-meta.sh').read_text()
 assert "DEPTP_OPENSTLINUX_PV='1.6.7+2.5.2+20240628'" in meta
-assert 'stm32mp257-tsn-deptp (= ${deptp_deb_ver})' in meta
+assert 'stm32mp2-tsn-deptp (= ${deptp_deb_ver})' in meta
 workflow = Path('.github/workflows/build-publish.yml').read_text()
 assert '--accept-deptp-eula true' in workflow
+old_package_prefix = 'stm32mp' + '257-tsn'
+assert old_package_prefix not in '\n'.join(
+    p.read_text()
+    for p in (
+        Path('scripts/build-dkms.sh'),
+        Path('scripts/build-meta.sh'),
+        Path('scripts/build-userspace.sh'),
+        Path('packaging/dkms/acm/dkms.conf.in'),
+        Path('packaging/dkms/deip/dkms.conf.in'),
+        Path('packaging/dkms/edge/dkms.conf.in'),
+    )
+)
+acm_dkms = Path('packaging/dkms/acm/dkms.conf.in').read_text()
+assert 'build-with-edge-symvers.sh' in acm_dkms
+assert 'KBUILD_EXTRA_SYMBOLS' in Path('packaging/dkms/acm/build-with-edge-symvers.sh.in').read_text()
+assert 'sudo apt install stm32mp2-tsn-switch' in Path('README.md').read_text()
 PY
 
 work="$(mktemp -d)"; trap 'rm -rf "$work"' EXIT
@@ -134,18 +150,63 @@ for d in "$work/out"/*.deb; do dpkg-deb -I "$d" >/dev/null; done
 count="$(find "$work/out" -name '*.deb' | wc -l)"
 [[ "$count" -eq 8 ]] || { echo "unexpected package count: $count" >&2; exit 1; }
 
-dpkg-deb -f "$work/out/stm32mp257-tsn-switch_1.6.8-7_arm64.deb" Depends | grep -q 'stm32mp257-tsn-edge-dkms (= 1.6.8-7)'
-dpkg-deb -f "$work/out/stm32mp257-tsn-acm_1.6.8-7_arm64.deb" Depends | grep -q 'stm32mp257-tsn-acm-dkms (= 1.6.8-7)'
-dpkg-deb -c "$work/out/stm32mp257-tsn-edge-runtime_1.6.8-7_all.deb" | grep -q 'etc/modules-load.d/stm32mp257-tsn-edge.conf'
-dpkg-deb -e "$work/out/stm32mp257-tsn-edge-runtime_1.6.8-7_all.deb" "$work/control"
-grep -qx '/etc/modules-load.d/stm32mp257-tsn-edge.conf' "$work/control/conffiles"
-grep -qx '/etc/modprobe.d/stm32mp257-tsn-edge.conf' "$work/control/conffiles"
+dpkg-deb -f "$work/out/stm32mp2-tsn-switch_1.6.8-7_arm64.deb" Depends | grep -q 'stm32mp2-tsn-edge-dkms (= 1.6.8-7)'
+dpkg-deb -f "$work/out/stm32mp2-tsn-acm_1.6.8-7_arm64.deb" Depends | grep -q 'stm32mp2-tsn-acm-dkms (= 1.6.8-7)'
+dpkg-deb -c "$work/out/stm32mp2-tsn-edge-runtime_1.6.8-7_all.deb" | grep -q 'etc/modules-load.d/stm32mp2-tsn-edge.conf'
+dpkg-deb -e "$work/out/stm32mp2-tsn-edge-runtime_1.6.8-7_all.deb" "$work/control"
+grep -qx '/etc/modules-load.d/stm32mp2-tsn-edge.conf' "$work/control/conffiles"
+grep -qx '/etc/modprobe.d/stm32mp2-tsn-edge.conf' "$work/control/conffiles"
 
-dpkg-deb -x "$work/out/stm32mp257-tsn-edge-dkms_1.6.8-7_all.deb" "$work/edge"
-grep -q 'sched=fsc sid=sid' "$work/edge/usr/src/stm32mp257-tsn-edge-1.6.8+deb7/dkms.conf"
-dpkg-deb -e "$work/out/stm32mp257-tsn-edge-dkms_1.6.8-7_all.deb" "$work/edge-control"
+dpkg-deb -x "$work/out/stm32mp2-tsn-edge-dkms_1.6.8-7_all.deb" "$work/edge"
+grep -q 'sched=fsc sid=sid' "$work/edge/usr/src/stm32mp2-tsn-edge-1.6.8+deb7/dkms.conf"
+dpkg-deb -e "$work/out/stm32mp2-tsn-edge-dkms_1.6.8-7_all.deb" "$work/edge-control"
 grep -q 'dkms build' "$work/edge-control/postinst"
 ! grep -q '|| true' "$work/edge-control/postinst"
+
+dpkg-deb -x "$work/out/stm32mp2-tsn-acm-dkms_1.6.8-7_all.deb" "$work/acm"
+acm_src="$work/acm/usr/src/stm32mp2-tsn-acm-1.6.8+deb7"
+grep -q 'build-with-edge-symvers.sh' "$acm_src/dkms.conf"
+grep -q '/usr/src/stm32mp2-tsn-edge-1.6.8+deb7' "$acm_src/dkms.conf"
+grep -q 'KBUILD_EXTRA_SYMBOLS' "$acm_src/build-with-edge-symvers.sh"
+grep -q 'edgx_ktime_get_worker_ptp' "$acm_src/build-with-edge-symvers.sh"
+bash -n "$acm_src/build-with-edge-symvers.sh"
+
+# Exercise the helper with a mocked make. The EDGE invocation emits the exported
+# symbol; the ACM invocation must receive the generated KBUILD_EXTRA_SYMBOLS path.
+helper_test="$work/acm-helper"
+mkdir -p "$helper_test/bin"
+cat > "$helper_test/bin/make" <<'EOF'
+#!/bin/sh
+set -eu
+dir=$PWD
+args=
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    -C) dir=$2; shift 2 ;;
+    *) args="${args}${args:+ }$1"; shift ;;
+  esac
+done
+case "$dir" in
+  */edge)
+    printf '%s\n' '0x00000000 edgx_ktime_get_worker_ptp edgx_pfm_lkm EXPORT_SYMBOL' > "$dir/Module.symvers"
+    ;;
+  */acm)
+    printf '%s\n' "$args" > "$HELPER_TEST_LOG"
+    ;;
+  *)
+    echo "unexpected make directory: $dir" >&2
+    exit 1
+    ;;
+esac
+EOF
+chmod 0755 "$helper_test/bin/make"
+edge_src="$work/edge/usr/src/stm32mp2-tsn-edge-1.6.8+deb7"
+HELPER_TEST_LOG="$helper_test/acm.args" \
+  PATH="$helper_test/bin:$PATH" \
+  sh "$acm_src/build-with-edge-symvers.sh" /mock/kernel "$edge_src"
+grep -q 'KBUILD_EXTRA_SYMBOLS=' "$helper_test/acm.args"
+grep -q 'FLX_MODULE_PATH=' "$helper_test/acm.args"
+grep -q 'ACM_DRIVER_VERSION=' "$helper_test/acm.args"
 
 "$ROOT/scripts/build-meta.sh" \
   --version 1.6.8 \
@@ -154,8 +215,8 @@ grep -q 'dkms build' "$work/edge-control/postinst"
   --with-userspace true \
   --with-acm false \
   --maintainer 'Test <test@example.invalid>'
-dpkg-deb -f "$work/userspace-meta/stm32mp257-tsn-switch_1.6.8-7_arm64.deb" Depends | grep -q 'stm32mp257-tsn-libtsn (= 1.6.8-7)'
-dpkg-deb -f "$work/userspace-meta/stm32mp257-tsn-switch_1.6.8-7_arm64.deb" Depends | grep -q 'stm32mp257-tsntool (= 1.6.8-7)'
-dpkg-deb -f "$work/userspace-meta/stm32mp257-tsn-switch_1.6.8-7_arm64.deb" Depends | grep -q 'stm32mp257-tsn-deptp (= 1.6.7+2.5.2+20240628-7)'
+dpkg-deb -f "$work/userspace-meta/stm32mp2-tsn-switch_1.6.8-7_arm64.deb" Depends | grep -q 'stm32mp2-tsn-libtsn (= 1.6.8-7)'
+dpkg-deb -f "$work/userspace-meta/stm32mp2-tsn-switch_1.6.8-7_arm64.deb" Depends | grep -q 'stm32mp2-tsntool (= 1.6.8-7)'
+dpkg-deb -f "$work/userspace-meta/stm32mp2-tsn-switch_1.6.8-7_arm64.deb" Depends | grep -q 'stm32mp2-tsn-deptp (= 1.6.7+2.5.2+20240628-7)'
 
 echo 'Debian 13 TSN template checks passed.'

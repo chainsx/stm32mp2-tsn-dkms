@@ -16,7 +16,7 @@ done
 [[ -n "$source_dir" && -n "$packages" && -n "$out" && -n "$version" && -n "$revision" ]] || { echo 'missing required manifest argument' >&2; exit 64; }
 mkdir -p "$(dirname "$out")"
 {
-  echo 'STM32MP257 TSN Build Manifest'
+  echo 'STM32MP2 TSN Build Manifest'
   echo 'Target: Debian GNU/Linux 13 (trixie) arm64'
   echo "Version: $version-$revision"
   echo "Userspace included: $with_userspace"

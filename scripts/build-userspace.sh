@@ -98,14 +98,14 @@ libroot="$work/libtsn"
 mkdir -p "$libroot/DEBIAN"
 copy_libclass "$stage" "$libroot" '^libtsn\.so\..+$'
 compgen -G "$libroot$archlib/libtsn.so.*" >/dev/null || die 'tsntool install produced no versioned libtsn runtime library'
-write_debian13_preinst "$libroot/DEBIAN/preinst" stm32mp257-tsn-libtsn
+write_debian13_preinst "$libroot/DEBIAN/preinst" stm32mp2-tsn-libtsn
 write_ldconfig_scripts "$libroot"
 assert_no_missing_elf_deps "$libroot" "$libroot$archlib"
 lib_deps="$(debian_runtime_dependencies "$libroot" "$libroot$archlib")"
-write_control "$libroot/DEBIAN/control" stm32mp257-tsn-libtsn "$tsntool_deb_ver" arm64 "$lib_deps" 'TTTech TSN Switch runtime API library' "$maintainer" 'Multi-Arch: same'
-write_shlibs_from_root "$libroot" stm32mp257-tsn-libtsn "$tsntool_deb_ver" "$libroot$archlib"
-add_doc_payload_map "$libroot" stm32mp257-tsn-libtsn "$libroot"
-build_deb "$libroot" "$out_dir/stm32mp257-tsn-libtsn_${tsntool_deb_ver}_arm64.deb"
+write_control "$libroot/DEBIAN/control" stm32mp2-tsn-libtsn "$tsntool_deb_ver" arm64 "$lib_deps" 'TTTech TSN Switch runtime API library' "$maintainer" 'Multi-Arch: same'
+write_shlibs_from_root "$libroot" stm32mp2-tsn-libtsn "$tsntool_deb_ver" "$libroot$archlib"
+add_doc_payload_map "$libroot" stm32mp2-tsn-libtsn "$libroot"
+build_deb "$libroot" "$out_dir/stm32mp2-tsn-libtsn_${tsntool_deb_ver}_arm64.deb"
 
 devroot="$work/libtsn-dev"
 mkdir -p "$devroot/DEBIAN" "$devroot/usr/include/libtsn"
@@ -115,31 +115,31 @@ if [[ -d "$stage/usr/include/libtsn" ]]; then
 fi
 compgen -G "$devroot$archlib/libtsn.so" >/dev/null || die 'tsntool install produced no unversioned development library symlink'
 find "$devroot/usr/include/libtsn" -type f -name '*.h' -print -quit | grep -q . || die 'tsntool install produced no libtsn development header'
-write_debian13_preinst "$devroot/DEBIAN/preinst" stm32mp257-tsn-libtsn-dev
-write_control "$devroot/DEBIAN/control" stm32mp257-tsn-libtsn-dev "$tsntool_deb_ver" arm64 "stm32mp257-tsn-libtsn (= $tsntool_deb_ver)" 'TTTech TSN Switch API development headers and link library' "$maintainer" 'Multi-Arch: same'
-add_doc_payload_map "$devroot" stm32mp257-tsn-libtsn-dev "$devroot"
-build_deb "$devroot" "$out_dir/stm32mp257-tsn-libtsn-dev_${tsntool_deb_ver}_arm64.deb"
+write_debian13_preinst "$devroot/DEBIAN/preinst" stm32mp2-tsn-libtsn-dev
+write_control "$devroot/DEBIAN/control" stm32mp2-tsn-libtsn-dev "$tsntool_deb_ver" arm64 "stm32mp2-tsn-libtsn (= $tsntool_deb_ver)" 'TTTech TSN Switch API development headers and link library' "$maintainer" 'Multi-Arch: same'
+add_doc_payload_map "$devroot" stm32mp2-tsn-libtsn-dev "$devroot"
+build_deb "$devroot" "$out_dir/stm32mp2-tsn-libtsn-dev_${tsntool_deb_ver}_arm64.deb"
 
 staticroot="$work/libtsn-staticdev"
 mkdir -p "$staticroot/DEBIAN"
 copy_libclass "$stage" "$staticroot" '^libtsn\.a$'
 if compgen -G "$staticroot$archlib/libtsn.a" >/dev/null; then
-  write_debian13_preinst "$staticroot/DEBIAN/preinst" stm32mp257-tsn-libtsn-staticdev
-  write_control "$staticroot/DEBIAN/control" stm32mp257-tsn-libtsn-staticdev "$tsntool_deb_ver" arm64 "stm32mp257-tsn-libtsn-dev (= $tsntool_deb_ver)" 'TTTech TSN Switch static API library' "$maintainer" 'Multi-Arch: same'
-  add_doc_payload_map "$staticroot" stm32mp257-tsn-libtsn-staticdev "$staticroot"
-  build_deb "$staticroot" "$out_dir/stm32mp257-tsn-libtsn-staticdev_${tsntool_deb_ver}_arm64.deb"
+  write_debian13_preinst "$staticroot/DEBIAN/preinst" stm32mp2-tsn-libtsn-staticdev
+  write_control "$staticroot/DEBIAN/control" stm32mp2-tsn-libtsn-staticdev "$tsntool_deb_ver" arm64 "stm32mp2-tsn-libtsn-dev (= $tsntool_deb_ver)" 'TTTech TSN Switch static API library' "$maintainer" 'Multi-Arch: same'
+  add_doc_payload_map "$staticroot" stm32mp2-tsn-libtsn-staticdev "$staticroot"
+  build_deb "$staticroot" "$out_dir/stm32mp2-tsn-libtsn-staticdev_${tsntool_deb_ver}_arm64.deb"
 fi
 
 toolroot="$work/tsntool"
 mkdir -p "$toolroot/DEBIAN" "$toolroot/usr/bin" "$toolroot/usr/share"
 copy_item "$stage/usr/bin/tsntool" "$toolroot/usr/bin/tsntool"
 [[ -d "$stage/usr/share/man" ]] && copy_tree_contents "$stage/usr/share/man" "$toolroot/usr/share/man"
-write_debian13_preinst "$toolroot/DEBIAN/preinst" stm32mp257-tsntool
+write_debian13_preinst "$toolroot/DEBIAN/preinst" stm32mp2-tsntool
 assert_no_missing_elf_deps "$toolroot" "$libroot$archlib"
 tool_deps="$(debian_runtime_dependencies "$toolroot" "$libroot$archlib")"
-write_control "$toolroot/DEBIAN/control" stm32mp257-tsntool "$tsntool_deb_ver" arm64 "stm32mp257-tsn-libtsn (= $tsntool_deb_ver), $tool_deps" 'TTTech TSN Ethernet Switch configuration utility' "$maintainer"
-add_doc_payload_map "$toolroot" stm32mp257-tsntool "$toolroot"
-build_deb "$toolroot" "$out_dir/stm32mp257-tsntool_${tsntool_deb_ver}_arm64.deb"
+write_control "$toolroot/DEBIAN/control" stm32mp2-tsntool "$tsntool_deb_ver" arm64 "stm32mp2-tsn-libtsn (= $tsntool_deb_ver), $tool_deps" 'TTTech TSN Ethernet Switch configuration utility' "$maintainer"
+add_doc_payload_map "$toolroot" stm32mp2-tsntool "$toolroot"
+build_deb "$toolroot" "$out_dir/stm32mp2-tsntool_${tsntool_deb_ver}_arm64.deb"
 
 # The official binary recipe explicitly requires EULA acceptance, installs the
 # supplied service/configuration, and deliberately disables automatic startup.
@@ -154,14 +154,14 @@ copy_tree_contents "$deptp_dir/aarch64" "$deptproot"
 install -D -m 0644 "$ROOT/packaging/userspace/deptp/deptp.service" "$deptproot/lib/systemd/system/deptp.service"
 install -D -m 0644 "$ROOT/packaging/userspace/deptp/ptp_config.xml" "$deptproot/etc/deptp/ptp_config.xml"
 printf '%s\n' /etc/deptp/ptp_config.xml > "$deptproot/DEBIAN/conffiles"
-write_debian13_preinst "$deptproot/DEBIAN/preinst" stm32mp257-tsn-deptp
+write_debian13_preinst "$deptproot/DEBIAN/preinst" stm32mp2-tsn-deptp
 write_ldconfig_scripts "$deptproot"
 assert_no_missing_elf_deps "$deptproot" "$deptproot/usr/lib" "$deptproot$archlib"
 deptp_deps="$(debian_runtime_dependencies "$deptproot" "$deptproot/usr/lib" "$deptproot$archlib")"
-write_control "$deptproot/DEBIAN/control" stm32mp257-tsn-deptp "$deptp_deb_ver" arm64 "$deptp_deps, systemd" 'TTTech DE-gPTP daemon for STM32MP257 TSN Switch' "$maintainer"
-write_shlibs_from_root "$deptproot" stm32mp257-tsn-deptp "$deptp_deb_ver" "$deptproot/usr/lib"
-add_doc_payload_map "$deptproot" stm32mp257-tsn-deptp "$deptproot"
-build_deb "$deptproot" "$out_dir/stm32mp257-tsn-deptp_${deptp_deb_ver}_arm64.deb"
+write_control "$deptproot/DEBIAN/control" stm32mp2-tsn-deptp "$deptp_deb_ver" arm64 "$deptp_deps, systemd" 'TTTech DE-gPTP daemon for STM32MP257 TSN Switch' "$maintainer"
+write_shlibs_from_root "$deptproot" stm32mp2-tsn-deptp "$deptp_deb_ver" "$deptproot/usr/lib"
+add_doc_payload_map "$deptproot" stm32mp2-tsn-deptp "$deptproot"
+build_deb "$deptproot" "$out_dir/stm32mp2-tsn-deptp_${deptp_deb_ver}_arm64.deb"
 
 # ACM carries its own board integration and is never selected by the default
 # switch meta-package. Preserve every payload file and reject missing ELF deps.
@@ -174,13 +174,13 @@ if [[ "$with_acm" == true ]]; then
   acmroot="$work/acm-config"
   mkdir -p "$acmroot/DEBIAN"
   copy_tree_contents "$acm_stage" "$acmroot"
-  write_debian13_preinst "$acmroot/DEBIAN/preinst" stm32mp257-tsn-acm-config
+  write_debian13_preinst "$acmroot/DEBIAN/preinst" stm32mp2-tsn-acm-config
   write_ldconfig_scripts "$acmroot"
   assert_no_missing_elf_deps "$acmroot" "$acmroot/usr/lib" "$acmroot$archlib"
   acm_deps="$(debian_runtime_dependencies "$acmroot" "$acmroot/usr/lib" "$acmroot$archlib")"
-  write_control "$acmroot/DEBIAN/control" stm32mp257-tsn-acm-config "$tsntool_deb_ver" arm64 "$acm_deps, stm32mp257-tsn-edge-runtime (= $tsntool_deb_ver)" 'TTTech ACM user-space configuration interface' "$maintainer"
+  write_control "$acmroot/DEBIAN/control" stm32mp2-tsn-acm-config "$tsntool_deb_ver" arm64 "$acm_deps, stm32mp2-tsn-edge-runtime (= $tsntool_deb_ver)" 'TTTech ACM user-space configuration interface' "$maintainer"
   [[ -f "$acmroot/etc/default/config_acm" ]] && printf '%s\n' /etc/default/config_acm > "$acmroot/DEBIAN/conffiles"
-  write_shlibs_from_root "$acmroot" stm32mp257-tsn-acm-config "$tsntool_deb_ver" "$acmroot/usr/lib"
-  add_doc_payload_map "$acmroot" stm32mp257-tsn-acm-config "$acmroot"
-  build_deb "$acmroot" "$out_dir/stm32mp257-tsn-acm-config_${tsntool_deb_ver}_arm64.deb"
+  write_shlibs_from_root "$acmroot" stm32mp2-tsn-acm-config "$tsntool_deb_ver" "$acmroot/usr/lib"
+  add_doc_payload_map "$acmroot" stm32mp2-tsn-acm-config "$acmroot"
+  build_deb "$acmroot" "$out_dir/stm32mp2-tsn-acm-config_${tsntool_deb_ver}_arm64.deb"
 fi

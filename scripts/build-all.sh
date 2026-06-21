@@ -4,7 +4,7 @@ SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 . "$SCRIPT_DIR/lib.sh"
 
 source_dir= version= revision=1 out_dir=dist/debian
-maintainer='STM32MP257 TSN Packaging <noreply@example.invalid>'
+maintainer='STM32MP2 TSN Packaging <noreply@example.invalid>'
 with_userspace=false with_acm=false accept_deptp_eula=false edge_interface=end1
 while [[ $# -gt 0 ]]; do
   case "$1" in

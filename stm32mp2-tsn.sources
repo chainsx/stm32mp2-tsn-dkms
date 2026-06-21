@@ -2,4 +2,4 @@ Types: deb
 URIs: https://chainsx.github.io/stm32mp2-tsn-dkms/debian
 Suites: ./
 Architectures: arm64
-Signed-By: /usr/share/keyrings/stm32mp257-tsn-archive-keyring.gpg
+Signed-By: /usr/share/keyrings/stm32mp2-tsn-archive-keyring.gpg

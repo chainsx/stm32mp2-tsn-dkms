@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
-name='STM32MP257 TSN APT Archive'
+name='STM32MP2 TSN APT Archive'
 email='noreply@example.invalid'
 out=.secrets
 while [[ $# -gt 0 ]]; do

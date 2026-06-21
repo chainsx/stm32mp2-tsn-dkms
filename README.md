@@ -1,4 +1,4 @@
-# STM32MP257 Ethernet Switch / TSN packages for Debian 13 arm64
+# STM32MP2 Ethernet Switch / TSN packages for Debian 13 arm64
 
 This repository converts the STM32MP257 TSN Switch components selected by the
 OpenSTLinux Scarthgap layers into a signed APT repository for **Debian GNU/Linux
@@ -21,26 +21,26 @@ file in one opaque archive:
 ```text
 OpenSTLinux component                    Debian 13 package
 ---------------------------------------  -------------------------------------------
-kernel-module-st-stm32-deip              stm32mp257-tsn-deip-dkms
+kernel-module-st-stm32-deip              stm32mp2-tsn-deip-dkms
                                          -> stm32_deip.ko
-kernel-module-edge                       stm32mp257-tsn-edge-dkms
+kernel-module-edge                       stm32mp2-tsn-edge-dkms
                                          -> edgx_pfm_lkm.ko
-edge runtime fragments                   stm32mp257-tsn-edge-runtime
+edge runtime fragments                   stm32mp2-tsn-edge-runtime
                                          -> exact module-load and softdep rules
-edge public header                       stm32mp257-tsn-edge-dev
-libtsn: lib*.so.*                        stm32mp257-tsn-libtsn
-libtsn-dev: headers + lib*.so            stm32mp257-tsn-libtsn-dev
-libtsn-staticdev: lib*.a                 stm32mp257-tsn-libtsn-staticdev, when present
-tsntool                                  stm32mp257-tsntool
-de-ptp-bin_release                       stm32mp257-tsn-deptp
-kernel-module-tsn-acm (optional)         stm32mp257-tsn-acm-dkms
-libacmconfig (optional)                  stm32mp257-tsn-acm-config
+edge public header                       stm32mp2-tsn-edge-dev
+libtsn: lib*.so.*                        stm32mp2-tsn-libtsn
+libtsn-dev: headers + lib*.so            stm32mp2-tsn-libtsn-dev
+libtsn-staticdev: lib*.a                 stm32mp2-tsn-libtsn-staticdev, when present
+tsntool                                  stm32mp2-tsntool
+de-ptp-bin_release                       stm32mp2-tsn-deptp
+kernel-module-tsn-acm (optional)         stm32mp2-tsn-acm-dkms
+libacmconfig (optional)                  stm32mp2-tsn-acm-config
 ```
 
-`stm32mp257-tsn-switch` is the base meta-package. It installs the two DKMS
+`stm32mp2-tsn-switch` is the base meta-package. It installs the two DKMS
 modules and the board configuration. When the manual workflow enables
 `include_userspace`, it also depends on `libtsn`, `tsntool`, and DE-gPTP.
-`stm32mp257-tsn-acm` remains separate because a Switch-enabled FDT does not by
+`stm32mp2-tsn-acm` remains separate because a Switch-enabled FDT does not by
 itself prove that the ACM hardware node and board resources are available.
 
 For user-space builds, the upstream revisions are deliberately fixed to the
@@ -83,7 +83,10 @@ container. Before a package is emitted, the builder:
 
 DKMS packages use `BUILD_EXCLUSIVE_ARCH="^(aarch64|arm64)$"`, include the Debian
 revision in `PACKAGE_VERSION`, and make a failed `dkms build`/`dkms install`
-fatal while printing the associated `make.log`.
+fatal while printing the associated `make.log`. When ACM is selected, its DKMS
+build creates an isolated EDGE build for the target kernel and passes EDGE's
+`Module.symvers` through `KBUILD_EXTRA_SYMBOLS`; this resolves the exported
+`edgx_ktime_get_worker_ptp` dependency during `modpost`.
 
 ## Publish through GitHub Actions
 
@@ -91,7 +94,7 @@ fatal while printing the associated `make.log`.
 
    ```bash
    ./scripts/bootstrap-signing-key.sh \
-     --name 'STM32MP257 TSN APT Archive' \
+     --name 'STM32MP2 TSN APT Archive' \
      --email 'cchainsx@gmail.com' \
      --out .secrets
    ```
@@ -102,7 +105,7 @@ fatal while printing the associated `make.log`.
 3. In repository settings, enable **Read and write permissions** for workflows;
    set Pages to **GitHub Actions**.
 
-4. Open **Build and publish STM32MP257 TSN packages for Debian 13** in Actions,
+4. Open **Build and publish STM32MP2 TSN packages for Debian 13** in Actions,
    select `main`, and use a new positive `package_revision` for every republish.
    Keep `include_userspace=false` unless both TTTech/ST acknowledgement fields
    are true and publication rights have been confirmed.
@@ -124,7 +127,20 @@ Install the published key/source, then install the base stack:
 
 ```bash
 sudo apt update
-sudo apt install stm32mp257-tsn-switch
+sudo apt install stm32mp2-tsn-switch
+```
+
+### Migration from the legacy package prefix
+
+Earlier repository publications used the `stm32mp257-tsn-*` package namespace.
+Remove those packages before installing the new `stm32mp2-tsn-*` packages: both
+namespaces install the same DKMS modules and must not coexist.
+
+```bash
+sudo apt purge 'stm32mp257-tsn-*'
+sudo apt autoremove
+sudo apt update
+sudo apt install stm32mp2-tsn-switch
 ```
 
 The runtime configuration uses the OpenSTLinux default `end1:0`. Check the
@@ -132,7 +148,7 @@ actual MAC name before loading the switch stack:
 
 ```bash
 ip -br link
-cat /etc/modprobe.d/stm32mp257-tsn-edge.conf
+cat /etc/modprobe.d/stm32mp2-tsn-edge.conf
 sudo modprobe stm32_deip
 sudo modprobe edgx_pfm_lkm
 sudo dkms status

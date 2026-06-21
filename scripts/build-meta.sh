@@ -53,13 +53,13 @@ DOC
   build_deb "$root" "$out_dir/${package}_${deb_ver}_arm64.deb"
 }
 
-base="stm32mp257-tsn-deip-dkms (= ${deb_ver}), stm32mp257-tsn-edge-dkms (= ${deb_ver}), stm32mp257-tsn-edge-runtime (= ${deb_ver})"
+base="stm32mp2-tsn-deip-dkms (= ${deb_ver}), stm32mp2-tsn-edge-dkms (= ${deb_ver}), stm32mp2-tsn-edge-runtime (= ${deb_ver})"
 if [[ "$with_userspace" == true ]]; then
-  base+=", stm32mp257-tsn-libtsn (= ${deb_ver}), stm32mp257-tsntool (= ${deb_ver}), stm32mp257-tsn-deptp (= ${deptp_deb_ver})"
+  base+=", stm32mp2-tsn-libtsn (= ${deb_ver}), stm32mp2-tsntool (= ${deb_ver}), stm32mp2-tsn-deptp (= ${deptp_deb_ver})"
 fi
-make_meta stm32mp257-tsn-switch "$base" 'STM32MP257 Ethernet Switch / TSN base stack'
+make_meta stm32mp2-tsn-switch "$base" 'STM32MP257 Ethernet Switch / TSN base stack'
 if [[ "$with_acm" == true ]]; then
-  acm="stm32mp257-tsn-switch (= ${deb_ver}), stm32mp257-tsn-acm-dkms (= ${deb_ver}), stm32mp257-tsn-acm-runtime (= ${deb_ver})"
-  [[ "$with_userspace" == true ]] && acm+=", stm32mp257-tsn-acm-config (= ${deb_ver})"
-  make_meta stm32mp257-tsn-acm "$acm" 'STM32MP257 optional TSN Acceleration Module stack'
+  acm="stm32mp2-tsn-switch (= ${deb_ver}), stm32mp2-tsn-acm-dkms (= ${deb_ver}), stm32mp2-tsn-acm-runtime (= ${deb_ver})"
+  [[ "$with_userspace" == true ]] && acm+=", stm32mp2-tsn-acm-config (= ${deb_ver})"
+  make_meta stm32mp2-tsn-acm "$acm" 'STM32MP257 optional TSN Acceleration Module stack'
 fi

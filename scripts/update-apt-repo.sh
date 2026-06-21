@@ -2,7 +2,7 @@
 set -Eeuo pipefail
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 . "$SCRIPT_DIR/lib.sh"
-repo_dir= key_id= public_key= origin='STM32MP257 TSN APT Archive' label='STM32MP257 TSN APT Archive'
+repo_dir= key_id= public_key= origin='STM32MP2 TSN APT Archive' label='STM32MP2 TSN APT Archive'
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --repo) repo_dir=$2; shift 2;;

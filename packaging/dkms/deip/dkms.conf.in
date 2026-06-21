@@ -1,4 +1,4 @@
-PACKAGE_NAME="stm32mp257-tsn-deip"
+PACKAGE_NAME="stm32mp2-tsn-deip"
 PACKAGE_VERSION="@DKMS_VERSION@"
 BUILT_MODULE_NAME[0]="stm32_deip"
 DEST_MODULE_LOCATION[0]="/updates/dkms"

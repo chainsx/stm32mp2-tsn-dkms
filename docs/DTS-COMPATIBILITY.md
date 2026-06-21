@@ -7,27 +7,31 @@ arch/arm64/boot/dts/st/myb-stm32mp257x-1GB-ethswitch.dts
 ```
 
 The selected DTS defines `ETH_SWITCH_ENABLE 1`, includes
-`myb-stm32mp257x-ethswitch.dtsi`, and that include enables `switch0`. It also
-configures the switch for RGMII and enables the ETH1 and ETH2 controller nodes.
-The DKMS package therefore does **not** ship a DTS overlay or patch.
+`myb-stm32mp257x-ethswitch.dtsi`, enables `switch0`, configures RGMII, and
+enables the ETH1/ETH2 controllers. The package therefore does not install a
+DTB, overlay, or DTS patch.
 
-The OpenSTLinux TSN layer associates EDGE with the main TSN bridge Ethernet
-interface using the systemd predictable name `end1`. The generated
-`stm32mp257-tsn-edge-runtime` package installs:
+The OpenSTLinux EDGE recipe passes the main TSN bridge interface to the module
+through `DEFAULT_ETHERNET_MAIN_TSN_BRIDGE_INTERFACE`. This Debian 13 package
+mirrors that behaviour with:
 
 ```text
 /etc/modprobe.d/stm32mp257-tsn-edge.conf
 ```
 
-with `netif="end1:0"`. Inspect `ip -br link` after boot. If the ETH1 MAC has a
-different name on this rootfs, edit this one option before loading
-`edgx_pfm_lkm`.
+Default content:
 
-## ACM is optional
+```text
+softdep edgx_pfm_lkm: stmmac stm32_deip
+options edgx_pfm_lkm netif="end1:0"
+```
 
-The named MYiR Ethernet-switch DTS confirms a Switch configuration, but this
-repository does not infer an ACM device node solely from that fact. Install the
-ACM packages only when the final compiled FDT contains the ACM node required by
-your board integration. The ACM module has a soft dependency on `stmmac`,
-`stm32_deip`, and `edgx_pfm_lkm`; it is not part of the default switch meta
-package.
+On Debian 13, verify the actual interface name using `ip -br link` before
+loading `edgx_pfm_lkm`. Update only the `netif` option when the MAC is not
+named `end1`.
+
+## ACM remains optional
+
+A Switch-enabled DTS does not establish the presence of the ACM device node or
+all ACM-related board resources. Install ACM packages only after inspecting the
+actual booted FDT and validating the required hardware integration.

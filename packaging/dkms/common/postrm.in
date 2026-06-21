@@ -1,0 +1,13 @@
+#!/bin/sh
+set -eu
+module='@MODULE_NAME@'
+version='@DKMS_VERSION@'
+case "${1:-}" in
+  remove|purge)
+    if dkms status -m "$module" -v "$version" >/dev/null 2>&1; then
+      dkms remove -m "$module" -v "$version" --all
+    fi
+    depmod -a "$(uname -r)"
+    ;;
+esac
+exit 0

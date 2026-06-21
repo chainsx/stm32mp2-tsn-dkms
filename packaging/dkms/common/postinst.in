@@ -1,0 +1,36 @@
+#!/bin/sh
+set -eu
+module='@MODULE_NAME@'
+version='@DKMS_VERSION@'
+source_dir='/usr/src/@SOURCE_PACKAGE@-@DKMS_VERSION@'
+show_log() {
+  log="/var/lib/dkms/$module/$version/build/make.log"
+  if [ -r "$log" ]; then
+    echo "----- $log -----" >&2
+    cat "$log" >&2
+    echo "-------------------" >&2
+  fi
+}
+case "${1:-}" in
+  configure)
+    if [ ! -d "$source_dir" ]; then
+      echo "DKMS source directory is missing: $source_dir" >&2
+      exit 1
+    fi
+    if ! dkms status -m "$module" -v "$version" >/dev/null 2>&1; then
+      dkms add -m "$module" -v "$version"
+    fi
+    if ! dkms build -m "$module" -v "$version" -k "$(uname -r)"; then
+      show_log
+      echo "DKMS build failed. Install matching linux-headers-$(uname -r) and inspect the log above." >&2
+      exit 1
+    fi
+    if ! dkms install -m "$module" -v "$version" -k "$(uname -r)" --force; then
+      show_log
+      echo "DKMS installation failed." >&2
+      exit 1
+    fi
+    depmod -a "$(uname -r)"
+    ;;
+esac
+exit 0

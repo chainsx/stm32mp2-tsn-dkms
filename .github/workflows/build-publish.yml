@@ -1,25 +1,35 @@
-name: Build, commit and publish STM32MP257 TSN APT repository
+name: Build and publish STM32MP257 TSN packages for Debian 13
 
-on:
+"on":
   workflow_dispatch:
     inputs:
       tsn_version:
-        description: "TSN stack version embedded in package versions"
+        description: "TSN upstream version embedded in Debian package versions"
         required: true
         default: "1.6.8"
+        type: string
+      package_revision:
+        description: "Positive Debian package revision; increment for every republish"
+        required: true
+        default: "1"
         type: string
       switch_commit:
         description: "Exact tttech-tsn-swch-content commit pinned by OpenSTLinux scarthgap"
         required: true
         default: "28c85fb3a2205766947298eddcdba8149ed37068"
         type: string
-      include_userspace:
-        description: "Build libtsn, tsntool and DE-PTP arm64 packages"
+      edge_interface:
+        description: "Main TSN bridge interface, matching DEFAULT_ETHERNET_MAIN_TSN_BRIDGE_INTERFACE"
         required: true
-        default: true
+        default: "end1"
+        type: string
+      include_userspace:
+        description: "Build the opt-in TTTech libtsn, tsntool and DE-PTP Debian 13 arm64 packages"
+        required: true
+        default: false
         type: boolean
       include_acm:
-        description: "Also build optional ACM DKMS and libacmconfig packages"
+        description: "Also build optional ACM kernel and user-space packages"
         required: true
         default: false
         type: boolean
@@ -34,7 +44,7 @@ on:
         default: false
         type: boolean
       confirm_public_redistribution_rights:
-        description: "I confirm that publication of the selected user-space .deb files is permitted"
+        description: "I confirm that public publication of the selected user-space .deb files is permitted"
         required: true
         default: false
         type: boolean
@@ -50,7 +60,7 @@ concurrency:
 
 jobs:
   build-dkms:
-    name: Build TSN DKMS source packages
+    name: Build TSN DKMS and board configuration packages
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
@@ -63,11 +73,11 @@ jobs:
         run: |
           test "$GITHUB_REF" = refs/heads/main || { echo 'Run this workflow from main.' >&2; exit 1; }
 
-      - name: Install DKMS packaging tools
+      - name: Install packaging tools
         run: |
           sudo apt-get update
           sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
-            apt-utils ca-certificates dpkg-dev file git make xz-utils
+            apt-utils ca-certificates dpkg-dev file git make python3 xz-utils
 
       - name: Validate the repository template
         run: ./scripts/test-template.sh
@@ -80,11 +90,13 @@ jobs:
             --acm-ref '${{ inputs.acm_commit }}' \
             --with-acm '${{ inputs.include_acm }}'
 
-      - name: Build DKMS source and runtime packages
+      - name: Build DKMS source and board configuration packages
         run: |
           ./scripts/build-dkms.sh \
             --source upstream \
             --version '${{ inputs.tsn_version }}' \
+            --revision '${{ inputs.package_revision }}' \
+            --edge-interface '${{ inputs.edge_interface }}' \
             --out dist/debian \
             --with-acm '${{ inputs.include_acm }}' \
             --maintainer '${{ github.repository_owner }} <${{ github.repository_owner }}@users.noreply.github.com>'
@@ -97,7 +109,7 @@ jobs:
           path: dist/debian/*.deb
 
   build-userspace:
-    name: Build TSN arm64 user-space packages
+    name: Build TSN user-space packages in Debian 13 arm64
     if: inputs.include_userspace
     runs-on: ubuntu-24.04-arm
     steps:
@@ -112,30 +124,37 @@ jobs:
           test '${{ inputs.accept_tttech_license }}' = true || { echo 'TTTech/ST license acknowledgement is required for user-space packages.' >&2; exit 1; }
           test '${{ inputs.confirm_public_redistribution_rights }}' = true || { echo 'Public redistribution acknowledgement is required for user-space packages.' >&2; exit 1; }
 
-      - name: Install arm64 build and packaging tools
+      - name: Build inside Debian GNU/Linux 13 arm64
+        shell: bash
         run: |
-          sudo apt-get update
-          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
-            build-essential ca-certificates dpkg-dev git libbsd-dev make xz-utils
+          docker run --rm --platform linux/arm64 \
+            -v "$GITHUB_WORKSPACE:/work" \
+            -w /work \
+            debian:trixie \
+            bash -euc '
+              export DEBIAN_FRONTEND=noninteractive
+              apt-get update
+              apt-get install -y \
+                binutils build-essential ca-certificates dpkg-dev file git libbsd-dev make \
+                python3 xz-utils
+              test "$(. /etc/os-release; printf %s "$ID")" = debian
+              test "$(. /etc/os-release; printf %s "$VERSION_ID")" = 13
+              test "$(dpkg --print-architecture)" = arm64
+              ./scripts/fetch-upstream.sh \
+                --out upstream \
+                --switch-ref "${{ inputs.switch_commit }}" \
+                --acm-ref "${{ inputs.acm_commit }}" \
+                --with-acm "${{ inputs.include_acm }}"
+              ./scripts/build-userspace.sh \
+                --source upstream \
+                --version "${{ inputs.tsn_version }}" \
+                --revision "${{ inputs.package_revision }}" \
+                --out dist/debian \
+                --with-acm "${{ inputs.include_acm }}" \
+                --maintainer "${{ github.repository_owner }} <${{ github.repository_owner }}@users.noreply.github.com>"
+            '
 
-      - name: Fetch pinned OpenSTLinux TSN source
-        run: |
-          ./scripts/fetch-upstream.sh \
-            --out upstream \
-            --switch-ref '${{ inputs.switch_commit }}' \
-            --acm-ref '${{ inputs.acm_commit }}' \
-            --with-acm '${{ inputs.include_acm }}'
-
-      - name: Build arm64 user-space packages
-        run: |
-          ./scripts/build-userspace.sh \
-            --source upstream \
-            --version '${{ inputs.tsn_version }}' \
-            --out dist/debian \
-            --with-acm '${{ inputs.include_acm }}' \
-            --maintainer '${{ github.repository_owner }} <${{ github.repository_owner }}@users.noreply.github.com>'
-
-      - name: Upload user-space packages
+      - name: Upload Debian 13 arm64 user-space packages
         uses: actions/upload-artifact@v4
         with:
           name: tsn-userspace-packages
@@ -162,8 +181,7 @@ jobs:
       - name: Install archive tools
         run: |
           sudo apt-get update
-          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
-            apt-utils dpkg-dev gnupg
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y apt-utils dpkg-dev gnupg
 
       - name: Import APT signing key
         env:
@@ -187,10 +205,11 @@ jobs:
           path: dist/debian
           merge-multiple: true
 
-      - name: Build meta packages
+      - name: Build Debian 13 meta packages
         run: |
           ./scripts/build-meta.sh \
             --version '${{ inputs.tsn_version }}' \
+            --revision '${{ inputs.package_revision }}' \
             --out dist/debian \
             --with-userspace '${{ inputs.include_userspace }}' \
             --with-acm '${{ inputs.include_acm }}' \
@@ -210,6 +229,7 @@ jobs:
             --packages dist/debian \
             --out dist/site/BUILD-MANIFEST.txt \
             --version '${{ inputs.tsn_version }}' \
+            --revision '${{ inputs.package_revision }}' \
             --with-userspace '${{ inputs.include_userspace }}' \
             --with-acm '${{ inputs.include_acm }}'
           ./scripts/update-apt-repo.sh \
@@ -217,7 +237,7 @@ jobs:
             --key-id "$APT_SIGNING_KEY" \
             --public-key dist/site/KEY.gpg \
             --origin '${{ github.repository }}' \
-            --label 'STM32MP257 TSN APT Archive'
+            --label 'STM32MP257 TSN APT Archive for Debian 13'
           sed \
             -e 's|@GITHUB_OWNER@|${{ github.repository_owner }}|g' \
             -e 's|@GITHUB_REPOSITORY@|${{ github.event.repository.name }}|g' \
@@ -240,14 +260,14 @@ jobs:
             echo 'APT publication is already current.'
             exit 0
           fi
-          git commit -m "Publish STM32MP257 TSN ${{ inputs.tsn_version }}" \
+          git commit -m "Publish Debian 13 STM32MP257 TSN ${{ inputs.tsn_version }}-${{ inputs.package_revision }}" \
                      -m 'Generated by GitHub Actions from pinned OpenSTLinux sources.'
           git push origin HEAD:main
 
       - name: Upload complete repository artifact
         uses: actions/upload-artifact@v4
         with:
-          name: stm32mp257-tsn-${{ inputs.tsn_version }}
+          name: stm32mp257-tsn-${{ inputs.tsn_version }}-${{ inputs.package_revision }}
           if-no-files-found: error
           path: |
             debian/*.deb

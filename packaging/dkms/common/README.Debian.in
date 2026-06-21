@@ -1,0 +1,10 @@
+This is an out-of-tree STM32MP257 TSN DKMS module package for Debian 13 arm64.
+
+The package configures DKMS immediately. Matching headers for the running kernel
+are mandatory:
+
+  apt install linux-headers-$(uname -r) build-essential dkms
+
+A failed DKMS build is intentionally fatal and leaves the compiler log at:
+
+  /var/lib/dkms/@MODULE_NAME@/@DKMS_VERSION@/build/make.log

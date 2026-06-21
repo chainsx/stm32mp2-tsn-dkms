@@ -1,63 +1,85 @@
-# STM32MP257 Ethernet Switch / TSN DKMS and APT repository
+# STM32MP257 Ethernet Switch / TSN packages for Debian 13 arm64
 
-This repository packages the **out-of-tree** Ethernet Switch / TSN modules used
-by OpenSTLinux for an STM32MP257 and publishes a signed flat Debian/Ubuntu APT
-repository. It targets the MYiR device tree:
+This repository converts the STM32MP257 TSN Switch components selected by the
+OpenSTLinux Scarthgap layers into a signed APT repository for **Debian GNU/Linux
+13 (trixie) arm64 only**. It targets the MYiR device tree:
 
 ```text
 chainsx/linux-stm32mp2:linux-6.6
 arch/arm64/boot/dts/st/myb-stm32mp257x-1GB-ethswitch.dts
 ```
 
-That DTS enables the Ethernet Switch (`ETH_SWITCH_ENABLE=1` and `switch0`
-status `okay`). See [docs/DTS-COMPATIBILITY.md](docs/DTS-COMPATIBILITY.md).
+The DTS enables the Ethernet Switch (`ETH_SWITCH_ENABLE=1` and `switch0`
+`status = "okay"`). This repository does not ship a device-tree overlay or make
+an ACM assumption from Switch enablement alone.
 
-## Packages
+## OpenSTLinux-to-Debian package map
 
-The default `stm32mp257-tsn-switch` meta package installs:
-
-```text
-stm32mp257-tsn-deip-dkms      -> stm32_deip.ko
-stm32mp257-tsn-edge-dkms      -> edgx_pfm_lkm.ko
-stm32mp257-tsn-edge-runtime   -> modules-load/modprobe configuration
-```
-
-When the workflow is run with **include_userspace=true**, it also builds:
+The package split follows the ST Scarthgap recipes rather than placing every
+file in one opaque archive:
 
 ```text
-stm32mp257-tsn-libtsn         -> libtsn shared library
-stm32mp257-tsntool            -> TSN Switch configuration CLI
-stm32mp257-tsn-deptp          -> DE-gPTP daemon
+OpenSTLinux component                    Debian 13 package
+---------------------------------------  -------------------------------------------
+kernel-module-st-stm32-deip              stm32mp257-tsn-deip-dkms
+                                         -> stm32_deip.ko
+kernel-module-edge                       stm32mp257-tsn-edge-dkms
+                                         -> edgx_pfm_lkm.ko
+edge runtime fragments                   stm32mp257-tsn-edge-runtime
+                                         -> exact module-load and softdep rules
+edge public header                       stm32mp257-tsn-edge-dev
+libtsn: lib*.so.*                        stm32mp257-tsn-libtsn
+libtsn-dev: headers + lib*.so            stm32mp257-tsn-libtsn-dev
+libtsn-staticdev: lib*.a                 stm32mp257-tsn-libtsn-staticdev, when present
+tsntool                                  stm32mp257-tsntool
+de-ptp-bin_release                       stm32mp257-tsn-deptp
+kernel-module-tsn-acm (optional)         stm32mp257-tsn-acm-dkms
+libacmconfig (optional)                  stm32mp257-tsn-acm-config
 ```
 
-When **include_acm=true**, the optional ACM stack is also produced:
+`stm32mp257-tsn-switch` is the base meta-package. It installs the two DKMS
+modules and the board configuration. When the manual workflow enables
+`include_userspace`, it also depends on `libtsn`, `tsntool`, and DE-gPTP.
+`stm32mp257-tsn-acm` remains separate because a Switch-enabled FDT does not by
+itself prove that the ACM hardware node and board resources are available.
 
-```text
-stm32mp257-tsn-acm-dkms       -> acm.ko
-stm32mp257-tsn-acm-runtime    -> ACM module load configuration
-stm32mp257-tsn-acm-config     -> libacmconfig user-space library
-stm32mp257-tsn-acm            -> ACM meta package
-```
+## What is intentionally not packaged as a generic Debian service
 
-ACM is deliberately separate: Ethernet Switch enablement in the MYiR DTS does
-not by itself establish that the final FDT contains an ACM device node.
+The ST layer includes rootfs automation, systemd-networkd configuration,
+sysrepo/Netopeer integration, lldpd, mstpd, and time-synchronization policy.
+Those pieces are coupled to the OpenSTLinux image and network topology. This
+repository preserves the module, library, CLI, DE-gPTP service, and configuration
+boundaries, but it does **not** claim that its generic Debian package can safely
+apply ST's complete rootfs automation.
 
-## Source pins
+The `deptp.service` unit is shipped but remains disabled after installation,
+matching the ST recipe. `/etc/deptp/ptp_config.xml` is a Debian conffile. Review
+that configuration and the selected interface before enabling DE-gPTP.
 
-The build scripts default to the exact commits used by the OpenSTLinux
-Scarthgap layers:
+## Build input and safeguards
 
-```text
-TTTech switch content: 28c85fb3a2205766947298eddcdba8149ed37068
-TTTech ACM content:    23e1ed7d9942136d0526d6f429f0efc3ed2fe35e
-```
+The workflow pins the switch and optional ACM content commits used by the ST
+Scarthgap layers. User-space publication is opt-in because the ST recipes label
+these payloads as TTTech licensed, and DE-PTP requires explicit EULA acceptance.
+The workflow requires both acknowledgements before user-space artifacts are
+built or published.
 
-Build input is fetched in GitHub Actions; no upstream source or vendor binary
-is committed into this repository.
+All runtime user-space packages are built inside a native **Debian 13 arm64**
+container. Before a package is emitted, the builder:
 
-## Build and publish in GitHub Actions
+- rejects payload files not mapped by the OpenSTLinux component split;
+- runs `ldd` on every AArch64 ELF file and fails on `not found`;
+- derives the Debian runtime dependencies from the Debian 13 arm64 build
+  environment;
+- records every copied payload file and symlink in `PAYLOAD-MAP.tsv`.
 
-1. Create an archive signing key locally:
+DKMS packages use `BUILD_EXCLUSIVE_ARCH="^(aarch64|arm64)$"`, include the Debian
+revision in `PACKAGE_VERSION`, and make a failed `dkms build`/`dkms install`
+fatal while printing the associated `make.log`.
+
+## Publish through GitHub Actions
+
+1. Create an archive signing key:
 
    ```bash
    ./scripts/bootstrap-signing-key.sh \
@@ -66,95 +88,72 @@ is committed into this repository.
      --out .secrets
    ```
 
-2. Add `.secrets/private-key.asc` as the repository Actions secret
-   `APT_GPG_PRIVATE_KEY`. Keep the private key out of git.
+2. Store `.secrets/private-key.asc` as the repository Actions secret
+   `APT_GPG_PRIVATE_KEY`. Do not commit the private key.
 
-3. In **Settings → Actions → General**, set **Workflow permissions** to
-   **Read and write permissions**. In **Settings → Pages**, choose
-   **GitHub Actions**.
+3. In repository settings, enable **Read and write permissions** for workflows;
+   set Pages to **GitHub Actions**.
 
-4. Run **Build, commit and publish STM32MP257 TSN APT repository** from the
-   `main` branch.
+4. Open **Build and publish STM32MP257 TSN packages for Debian 13** in Actions,
+   select `main`, and use a new positive `package_revision` for every republish.
+   Keep `include_userspace=false` unless both TTTech/ST acknowledgement fields
+   are true and publication rights have been confirmed.
 
-The workflow builds source DKMS `.deb` files on `ubuntu-24.04`, builds arm64
-user-space `.deb` files on `ubuntu-24.04-arm`, creates `Packages`, `Release`,
-`InRelease`, `Release.gpg`, and `KEY.gpg`, then commits them into `main`:
+The workflow commits `debian/`, `KEY.gpg`, `stm32mp2-tsn.sources`, and
+`BUILD-MANIFEST.txt` back to `main`, then deploys the same static tree to GitHub
+Pages.
 
-```text
-main/
-├── debian/
-│   ├── *.deb
-│   ├── Packages*
-│   ├── Release
-│   ├── Release.gpg
-│   └── InRelease
-├── KEY.gpg
-├── stm32mp2-tsn.sources
-└── BUILD-MANIFEST.txt
-```
+## Install and validate on the target
 
-The same static tree is published to GitHub Pages at:
-
-```text
-https://chainsx.github.io/stm32mp2-tsn-dkms/debian/
-```
-
-## Install on STM32MP257
-
-The target must run a Linux 6.6-based kernel with matching headers installed:
+The target must run Debian GNU/Linux 13 arm64 with a Linux 6.6-based kernel and
+matching headers:
 
 ```bash
 sudo apt install dkms build-essential linux-headers-$(uname -r)
 ```
 
-Add the archive key and source:
+Install the published key/source, then install the base stack:
 
 ```bash
-BASE=https://chainsx.github.io/stm32mp2-tsn-dkms
-
-curl -fsSL "$BASE/KEY.gpg" \
-  | gpg --dearmor \
-  | sudo tee /usr/share/keyrings/stm32mp257-tsn-archive-keyring.gpg >/dev/null
-
-curl -fsSL "$BASE/stm32mp2-tsn.sources" \
-  | sudo tee /etc/apt/sources.list.d/stm32mp2-tsn.sources >/dev/null
-
 sudo apt update
 sudo apt install stm32mp257-tsn-switch
 ```
 
-The installed EDGE configuration assumes the OpenSTLinux systemd interface name
-`end1`. Confirm the ETH1 interface with `ip -br link`; adjust
-`/etc/modprobe.d/stm32mp257-tsn-edge.conf` before loading the stack when it is
-not `end1`.
+The runtime configuration uses the OpenSTLinux default `end1:0`. Check the
+actual MAC name before loading the switch stack:
 
 ```bash
-sudo dkms status
+ip -br link
+cat /etc/modprobe.d/stm32mp257-tsn-edge.conf
 sudo modprobe stm32_deip
 sudo modprobe edgx_pfm_lkm
+sudo dkms status
 lsmod | grep -E 'stm32_deip|edgx'
 ```
 
-To install ACM only after validating the final device tree:
+Review `/etc/deptp/ptp_config.xml` first. Enable DE-gPTP only when the PTP
+network and its interface configuration are known:
 
 ```bash
-sudo apt install stm32mp257-tsn-acm
+sudo systemctl enable --now deptp.service
+systemctl status deptp.service
 ```
 
-## Licensing
+Detailed verification, including module configuration, user-space closure, and
+DE-gPTP service checks, is in `docs/DEBIAN13-VALIDATION.md`.
 
-The kernel source recipes are GPL-2.0. The OpenSTLinux user-space recipes are
-labelled `TTTECH-license`, and the DE-PTP recipe requires an explicit ST EULA
-acceptance. User-space builds are therefore opt-in and Actions refuses them
-without both relevant acknowledgements. See
-[NOTICE-REDISTRIBUTION.md](NOTICE-REDISTRIBUTION.md).
-
-## Repository checks
+## Local template test
 
 ```bash
 ./scripts/test-template.sh
 ```
 
-This performs shell syntax validation, checks the workflow has an arm64
-user-space job and a commit-to-`main` publication step, then mock-builds all
-DKMS/runtime package templates.
+It validates shell and workflow structure and mock-builds all DKMS, runtime,
+header, and meta package templates with a non-default Debian revision.
+
+## Licensing and redistribution
+
+Kernel-source packaging follows the GPL-licensed upstream components. TSN
+user-space and DE-gPTP inputs are separately controlled by ST/TTTech terms.
+Read `NOTICE-REDISTRIBUTION.md`; do not enable user-space publication without the
+required licence acceptance and distribution rights.

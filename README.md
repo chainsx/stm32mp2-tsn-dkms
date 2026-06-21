@@ -88,32 +88,6 @@ build creates an isolated EDGE build for the target kernel and passes EDGE's
 `Module.symvers` through `KBUILD_EXTRA_SYMBOLS`; this resolves the exported
 `edgx_ktime_get_worker_ptp` dependency during `modpost`.
 
-## Publish through GitHub Actions
-
-1. Create an archive signing key:
-
-   ```bash
-   ./scripts/bootstrap-signing-key.sh \
-     --name 'STM32MP2 TSN APT Archive' \
-     --email 'cchainsx@gmail.com' \
-     --out .secrets
-   ```
-
-2. Store `.secrets/private-key.asc` as the repository Actions secret
-   `APT_GPG_PRIVATE_KEY`. Do not commit the private key.
-
-3. In repository settings, enable **Read and write permissions** for workflows;
-   set Pages to **GitHub Actions**.
-
-4. Open **Build and publish STM32MP2 TSN packages for Debian 13** in Actions,
-   select `main`, and use a new positive `package_revision` for every republish.
-   Keep `include_userspace=false` unless both TTTech/ST acknowledgement fields
-   are true and publication rights have been confirmed.
-
-The workflow commits `debian/`, `KEY.gpg`, `stm32mp2-tsn.sources`, and
-`BUILD-MANIFEST.txt` back to `main`, then deploys the same static tree to GitHub
-Pages.
-
 ## Install and validate on the target
 
 The target must run Debian GNU/Linux 13 arm64 with a Linux 6.6-based kernel and
@@ -125,9 +99,25 @@ sudo apt install dkms build-essential linux-headers-$(uname -r)
 
 Install the published key/source, then install the base stack:
 
+On the STM32MP2 ARM64 target:
+
+```bash
+curl -fsSL https://chainsx.github.io/stm32mp2-tsn-dkms/KEY.gpg \
+  | gpg --dearmor \
+  | sudo tee /usr/share/keyrings/stm32mp2-tsn-archive-keyring.gpg >/dev/null
+
+sudo tee /etc/apt/sources.list.d/stm32mp2-tsn.sources >/dev/null <<'EOF2'
+Types: deb
+URIs: https://chainsx.github.io/stm32mp2-tsn-dkms/debian
+Suites: ./
+Architectures: arm64
+Signed-By: /usr/share/keyrings/stm32mp2-tsn-archive-keyring.gpg
+EOF2
+```
+
 ```bash
 sudo apt update
-sudo apt install stm32mp2-tsn-switch
+sudo apt install stm32mp2-tsn*
 ```
 
 ### Migration from the legacy package prefix
